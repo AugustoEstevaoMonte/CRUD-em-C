@@ -225,7 +225,7 @@ int main (void){
                         if(userKey=='S')
                         {
                           usr.card.cartaoCancelado = 'c';
-                          gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                          gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
                           printf("Cartao cancelado com sucesso!!!\n");
                           allPause();
                         }
