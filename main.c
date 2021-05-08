@@ -95,6 +95,7 @@ int menuGerenciamento();
 
 //MAIN***********************************************************************************************
 int main (void){
+  printf("Inicio do programa");
   FILE *arqCadastro,*arqAdministrador, *arqIngressos; //Modificado hoje no dia 08/05/2021 
   struct tUsuario usr;
 	struct tAdministrador admin;
@@ -766,8 +767,3 @@ void leValidaCVcartao(char cv[])
 
   }while(strlen(cv)==1 || strlen(cv)!=3);
 }
-
-
-
-
-
