@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 //INICIO DAS DEFINIÇÕES*****************************************************************************************
 #define ERRO "O dado inserido e invalido!!\n"
@@ -27,18 +28,30 @@ struct tAdministrador
 	char adminPassword[MAX];
 };
 
+struct tCartaoUsr
+{
+  char usrNumCartao[MAX];
+  int cvCard;
+  char cartaoCancelado;
+};
+
 struct tUsuario
 {
   char usrName[MAX];
   char usrPassword[MAX];
   char usrNickName[MAX];
-  char usrCartao[MAX];
-	char cancelado;
-  char nomeCartao[MAX];
-  char cvCard[4];
+  struct tCartaoUsr card;
 };
-//FIM DA STRUCT*********************************************************************************************
 
+  struct tUsuario lerDadosUsr (int posicao, FILE *arq){
+	struct tUsuario usr;
+	fseek(arq, sizeof(usr)*posicao, SEEK_SET);
+	fread(&usr, sizeof(usr), 1, arq);
+	return usr;
+}
+//FIM DA STRUCT*********************************************************************************************
+int leValidaNumeroCartao(char num[]);
+int leValidaCVcard(int cvCard);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 void leValidaUsrName(char[]);
@@ -48,9 +61,6 @@ int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[]);
 int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser[]);
 int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]); 
 //Modificado hoje no dia 07/05/2021
-void leValidaNumeroCartao(char numCard[]);
-void leValidaNomeCartao(char nome[]);
-void leValidaCVcartao(char cv[]);
 
 int leValidaCodigo();
 void leValidaNomeBanda(char banda[]);
@@ -78,6 +88,13 @@ void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos);
 //Mostrar as informações dos ARQUIVOS
 void listagemIngressos(FILE*);
 
+//Excluir coisas
+
+//FUNÇÕES USADAS PARA SUBSTITUIR O SYSTEM pause
+void allPause();
+//FUNÇÕES USADAS PARA SUBSTITUIR O SYSTEM pause
+
+
 //INICIO DA FUNÇÃO FILE**************************************************************************************
 FILE *abreArquivo(char nomeArquivo[]);
 //FIM  DA FUNÇÃO FILE**************************************************************************************
@@ -100,8 +117,8 @@ int main (void){
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
-  char nomeUser;
-	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento;
+  char nomeUser,userKey;
+	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0;
 	arqCadastro = abreArquivo("cadastro.csv"); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
   arqIngressos = abreArquivo("ingressos.csv");
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
@@ -121,7 +138,7 @@ int main (void){
         if(verificaSeLoginEsenhaCorrespondem(arqCadastro,usr.usrNickName,usr.usrPassword)==1)
         {
           printf(ERRO);
-          system("pause");
+          allPause();
           goto volta;
         }
 				//INICIO DO SUB-MENU PARA USER
@@ -129,12 +146,12 @@ int main (void){
 					opcaoSMenuUser=menuUser();
 					// 1 - Ingressos disponiveis
 					// 2 - Forma de pagamento
-					// 3 - Excluir compra
+					// 3 - Meu carrinho
 					// 0 - Logout
 					switch(opcaoSMenuUser){
 						case 1:
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
-							system("pause");
+              listagemIngressos(arqIngressos);
 							break;
 						case 2:
 							//INICIO DO SUB-SUB-MENU PARA PAGAMENTO
@@ -146,26 +163,69 @@ int main (void){
 								// 0 - Voltar
 								switch(opcaoSSMenuPagamento){
 									case 1:
-										printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
-                    // vou editar aqui 
-                    leValidaNumeroCartao(usr.usrCartao); //Falta CV, nome da pessoa
-                    leValidaNomeCartao(usr.usrName);
-                    leValidaCVcartao(usr.cvCard);
-                    gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
-										getchar();//system("pause");
+                    do
+                    {    printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
+                          printf("Digite aqui o numero do cartao: \n");
+                          fflush(stdin);
+                          fgets(usr.card.usrNumCartao,MAX,stdin);
+                          erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
+                          if(erroFunc==1)
+                          {
+                            printf("O cartao precisa ter no minimo 8 numeros...\n");
+                            allPause();
+                          }
+
+                    }while(erroFunc==1);
+
+
+                      do
+                      {
+                        printf("Digite aqui o CV do cartao: \n");
+                        scanf("%d",&usr.card.cvCard);
+                        erroFunc = leValidaCVcard(usr.card.cvCard);
+                        if(erroFunc==1)
+                        {
+                             printf("O CV precisa ter 3 digitos...\n");
+                             allPause();
+                        }
+										  }while(erroFunc==1);
+
+
+                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                        printf("CADASTRADO COM SUCESSO!!\n");
+                        printf("Numero cartao: %s\n",usr.card.usrNumCartao);
+                        printf("CV cartao: %d\n",usr.card.cvCard);
 										break;
 									case 2:
 										printf("\n\n\n*** RETIRAR CARTAO ***\n\n\n");
+                    if(strcmp(usr.card.usrNumCartao,"")==0)
+                    {
+                      printf("Nenhum cartao cadastrado...\n");
+                    } else {
+                      printf("Numero do cartao: %s\n",usr.card.usrNumCartao);
+                      printf("Deseja remover o cartao? (S ou n) \n");
+                      fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                      scanf("%c",&userKey);
+                      userKey = toupper(userKey);
+                      if(userKey=='S')
+                      {
+                        usr.card.cartaoCancelado = 'c';
+                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                        printf("Cartao cancelado com sucesso!!!\n");
+                        allPause();
+                      }
+
+                    }
                     // e aqui também
-										getchar();//system("pause");
+                      
 										break;	
 									case 3:
 										printf("\n\n\n*** ADICIONAR DINHEIRO NA CARTEIRA ***\n\n\n");
-										getchar();//system("pause");
+										allPause();
 										break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
-							system("pause");
+							allPause();
 							break;
 						case 3:
 							do{
@@ -179,19 +239,19 @@ int main (void){
 								switch(opcaoSSMenuCarrinho){
 									case 1:
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									case 2:
 										printf("\n\n\n*** ADICIONAR INTEM ***\n\n\n");
-										system("pause");
+										allPause();
 										break;	
 									case 3:
 										printf("\n\n\n*** EXCLUIR INTEM ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
@@ -206,14 +266,14 @@ int main (void){
           if(verificaNicknameJaEstaEmUso(arqCadastro,usr.usrNickName)==1)
           {
             printf("Este nickname ja esta em uso, tente novamente...\n");
-            system("pause");
+            allPause();
             goto volta;
           }
           leValidaUsrPassword(usr.usrPassword);
           gravaDadosNoArquivoUsuario(arqCadastro,usr,-1); //Era pra escrever aqui
 					printf("Usuario cadastrado com sucesso...\n");
         
-				getchar();//system("pause");
+				getchar();//allPause();
 				break;
 			case 3:
 				printf("\n\n\n*** ENTRAR COMO ADMINISTRADOR ***\n\n\n");
@@ -232,11 +292,11 @@ int main (void){
 				if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)  //Modificado hoje no dia 07/05/2021 
 				{
 					printf(ERRO);
-					system("pause");
+					allPause();
 					goto volta;
 				}
 				printf("LOGIN REALIZADO COM SUCESSO!!!!\n"); // //Modificado hoje no dia 07/05/2021
-				system("pause");
+				allPause();
 				//INICIO DO SUB-MENU PARA ADMINISTRADOR
 				do{
 					opcaoSMenuAdm=menuAdm();
@@ -300,19 +360,19 @@ int main (void){
 								switch(opcaoSSMenuGerenciamento){
 									case 1:
 										printf("\n\n\n*** USUARIOS ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									case 2:
 										printf("\n\n\n*** ADMINISTRACAO ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									case 3:
 										printf("\n\n\n*** ADICIONAR CONTA DE ADMINISTRADOR ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									case 4:
 										printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
-										system("pause");
+										allPause();
 										break;
 									
 								}
@@ -345,7 +405,7 @@ int menuLogin(){
 		scanf("%d", &op);
 		if(op<0 || op>3){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>3);
 	return op;
@@ -367,7 +427,7 @@ int menuUser(){
 		scanf("%d", &op);
 		if(op<0 || op>3){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>3);
 	return op;
@@ -387,7 +447,7 @@ int menuPagamento(){
 		scanf("%d", &op);
 		if(op<0 || op>3){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>3);
 	return op;
@@ -409,7 +469,7 @@ int menuCarrinho(){
 		scanf("%d", &op);
 		if(op<0 || op>4){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>4);
 	return op;
@@ -432,7 +492,7 @@ int menuAdm(){
 		scanf("%d", &op);
 		if(op<0 || op>5){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>5);
 	return op;
@@ -453,7 +513,7 @@ int menuGerenciamento(){
 		scanf("%d", &op);
 		if(op<0 || op>4){
 			printf(ERRO);
-			system("pause");
+			allPause();
 		}
 	}while(op<0 || op>4);
 	return op;
@@ -707,35 +767,6 @@ float leValidaValor(){
 }
 
 
-void leValidaNumeroCartao(char numCard[])
-{
-  do
-  {
-    printf("Digite aqui o numero do seu cartao: \n");
-    fflush(stdin);
-    fgets(numCard,MAX,stdin);
-    if(strlen(numCard)==1 || strlen(numCard)<=8)
-    {
-        printf("Numero do cartao e invalido, necessita ter 8 digitos...\n");
-    }
-  }while(strlen(numCard)==1 || strlen(numCard)<=8); //Resolvido o erro
-}
-
-void leValidaNomeCartao(char nome[])
-{
-    do
-    {
-      printf("Digite aqui o nome do usuario do cartao: \n");
-      fflush(stdin);
-      fgets(nome,MAX,stdin);
-      if(strlen(nome)==1 || strlen(nome)<5)
-      {
-        printf("Nome invalido, necessita ter ate 5 caracteres...\n");
-      }
-    }while(strlen(nome)==1 || strlen(nome)<5);
-}
-
-
 void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos){
     fseek(arq, 0, SEEK_END);
 		fwrite(&ingressos, sizeof(ingressos), 1, arq);
@@ -751,19 +782,32 @@ void listagemIngressos(FILE *arq)
   }
 }
 
-
-void leValidaCVcartao(char cv[])
+int leValidaNumeroCartao(char num[])
 {
-  do
+  if(strlen(num)!=9)
   {
-    printf("Digite aqui o CV do seu cartao: \n");
-    fflush(stdin);
-    fgets(cv,4,stdin);
-    
-    if(strlen(cv)==1 || strlen(cv)!=3)
-    {
-      printf("CV invalido, necessita ter 3 digitos...\n");
-    }
+    return 1;
+  }
+  return 0;
+}
 
-  }while(strlen(cv)==1 || strlen(cv)!=3);
+
+void allPause()
+{
+  char allP;
+  printf("Pressione qualquer tecla para continuar...\n");
+  allP = getchar();
+  system("cls||clear");
+}  
+
+int leValidaCVcard(int cvCard)
+{
+  if(cvCard>=100 && cvCard<=999)
+  {
+    return 0;
+  }
+  else
+  {
+    return 1;
+  }
 }
