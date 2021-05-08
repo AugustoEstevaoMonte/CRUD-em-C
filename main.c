@@ -83,7 +83,10 @@ void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg);
 void gravaDadosArquivoAdministrador(FILE *arq, struct tAdministrador admin); //Modificado hoje no dia 07/05/2021
 void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos);
 //FIM DA GRAVAÇÃO DOS ARQUIVOS**************************************************************************************
+//CONSULTA informações
+int consultaNumeroCartao(FILE *arq, char busca[]);
 
+//CONSULTA INFORMAÇÕES
 
 //Mostrar as informações dos ARQUIVOS
 void listagemIngressos(FILE*);
@@ -118,7 +121,7 @@ int main (void){
 	struct tAdministrador admin;
   struct tIngressos ingressos;
   char nomeUser,userKey;
-	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0;
+	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX;
 	arqCadastro = abreArquivo("cadastro.csv"); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
   arqIngressos = abreArquivo("ingressos.csv");
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
@@ -191,32 +194,45 @@ int main (void){
 										  }while(erroFunc==1);
 
 
-                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                        gravaDadosNoArquivoUsuario(arqCadastro,usr,0);
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
                         printf("CV cartao: %d\n",usr.card.cvCard);
 										break;
 									case 2:
 										printf("\n\n\n*** RETIRAR CARTAO ***\n\n\n");
-                    if(strcmp(usr.card.usrNumCartao,"")==0)
+                    do
                     {
-                      printf("Nenhum cartao cadastrado...\n");
-                    } else {
-                      printf("Numero do cartao: %s\n",usr.card.usrNumCartao);
-                      printf("Deseja remover o cartao? (S ou n) \n");
-                      fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
-                      scanf("%c",&userKey);
-                      userKey = toupper(userKey);
-                      if(userKey=='S')
+                      printf("Digite aqui o numero do cartao que deseja remover: \n");
+                      fflush(stdin);
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
+                      if(erroFunc==1)
                       {
-                        usr.card.cartaoCancelado = 'c';
-                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
-                        printf("Cartao cancelado com sucesso!!!\n");
-                        allPause();
+                        printf("Numero de cartao invalido, tente novamente...\n");
                       }
+                      
+                    }while(erroFunc==1);
 
+                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
+                    if(posX == 0)
+                    {
+                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao);
+                        printf("Deseja remover o cartao? (S ou n) \n");
+                        fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                        scanf("%c",&userKey);
+                        userKey = toupper(userKey);
+                        if(userKey=='S')
+                        {
+                          usr.card.cartaoCancelado = 'c';
+                          gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                          printf("Cartao cancelado com sucesso!!!\n");
+                          allPause();
+                        }
+                    } else {
+                      printf("Numero de cartao invalido, tente novamente...\n");
+                      allPause();
                     }
-                    // e aqui também
                       
 										break;	
 									case 3:
@@ -810,4 +826,19 @@ int leValidaCVcard(int cvCard)
   {
     return 1;
   }
+}
+
+int consultaNumeroCartao(FILE *arq, char busca[])
+{
+  struct tUsuario usr;
+  int ind = 0;
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&usr, sizeof(usr), 1, arq) != 0)
+  {
+		if(strcmp(busca,usr.card.usrNumCartao)==0)
+    {
+      return 0;
+    }
+	}
+	return -1;
 }
