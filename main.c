@@ -179,9 +179,10 @@ int main (void){
                           }
 
                     }while(erroFunc==1);
-
-
-                      do
+                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
+                    if(posX==-1)
+                    {
+                        do
                       {
                         printf("Digite aqui o CV do cartao: \n");
                         scanf("%d",&usr.card.cvCard);
@@ -198,6 +199,14 @@ int main (void){
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
                         printf("CV cartao: %d\n",usr.card.cvCard);
+                    }else{
+                      printf("Numero de cartao ja inserido anteriormente...\n");
+                      allPause();
+                    }
+                    
+
+
+                      
 										break;
 									case 2:
 										printf("\n\n\n*** RETIRAR CARTAO ***\n\n\n");
@@ -837,8 +846,8 @@ int consultaNumeroCartao(FILE *arq, char busca[])
   {
 		if(strcmp(busca,usr.card.usrNumCartao)==0)
     {
-      return 0;
+      return 0; // 0 representa que achou o numero do cartao
     }
 	}
-	return -1;
+	return -1; // -1 representa não encontrado
 }
