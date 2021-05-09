@@ -41,6 +41,7 @@ struct tUsuario
   char usrPassword[MAX];
   char usrNickName[MAX];
   struct tCartaoUsr card;
+  float valorCarteira;
 };
 
   struct tUsuario lerDadosUsr (int posicao, FILE *arq){
@@ -52,6 +53,7 @@ struct tUsuario
 //FIM DA STRUCT*********************************************************************************************
 int leValidaNumeroCartao(char num[]);
 int leValidaCVcard(int cvCard);
+void leituraUsuario(FILE *arq);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 void leValidaUsrName(char[]);
@@ -122,6 +124,7 @@ int main (void){
   struct tIngressos ingressos;
   char nomeUser,userKey;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX;
+  float saldoCarteira=0;
 	arqCadastro = abreArquivo("cadastro.csv"); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
   arqIngressos = abreArquivo("ingressos.csv");
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
@@ -226,6 +229,7 @@ int main (void){
                     posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
                     if(posX == 0)
                     {
+                        leituraUsuario(arqCadastro);
                         printf("Numero do cartao: %s\n",usr.card.usrNumCartao);
                         printf("Deseja remover o cartao? (S ou n) \n");
                         fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
@@ -246,6 +250,34 @@ int main (void){
 										break;	
 									case 3:
 										printf("\n\n\n*** ADICIONAR DINHEIRO NA CARTEIRA ***\n\n\n");
+                     do
+                    {
+                      printf("Confirme o numero do cartao: \n");
+                      fflush(stdin);
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
+                      if(erroFunc==1)
+                      {
+                        printf("Numero de cartao invalido, tente novamente...\n");
+                      }
+                      
+                    }while(erroFunc==1);
+                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
+                    if(posX==0)
+                    {
+                      printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
+                      printf("Digite um valor que deseja adicionar: \n");
+                      scanf("%f",&saldoCarteira);
+                      usr.valorCarteira+=saldoCarteira;
+                      printf("VALOR ADICIONADO COM SUCESSO!!\n");
+                      gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
+                      allPause();
+                    } else{
+                      printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
+                      allPause();
+                    }
+                    printf("Valor recebeu: %0.2f\n",usr.valorCarteira);
+                    
 										allPause();
 										break;
 								}
@@ -850,4 +882,11 @@ int consultaNumeroCartao(FILE *arq, char busca[])
     }
 	}
 	return -1; // -1 representa não encontrado
+}
+
+void leituraUsuario(FILE *arq)
+{
+  struct tUsuario usr;
+	fseek(arq, 0, SEEK_SET);
+	fread(&usr,sizeof(usr),1,arq);
 }
