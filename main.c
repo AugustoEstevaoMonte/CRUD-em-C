@@ -54,6 +54,8 @@ struct tUsuario
 int leValidaNumeroCartao(char num[]);
 int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
+void cancelaCartaoUsr(FILE *arq, int reg);
+int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 void leValidaUsrName(char[]);
@@ -237,8 +239,9 @@ int main (void){
                         userKey = toupper(userKey);
                         if(userKey=='S')
                         {
-                          usr.card.cartaoCancelado = 'c';
+                          cancelaCartaoUsr(arqCadastro,posX);
                           gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
+                          excluirFisicamenteCartao (arqCadastro,"cadastro.csv");
                           printf("Cartao cancelado com sucesso!!!\n");
                           allPause();
                         }
@@ -889,4 +892,37 @@ void leituraUsuario(FILE *arq)
   struct tUsuario usr;
 	fseek(arq, 0, SEEK_SET);
 	fread(&usr,sizeof(usr),1,arq);
+}
+
+void cancelaCartaoUsr(FILE *arq, int reg)
+{
+	struct tUsuario usr;
+	fseek(arq, sizeof(usr)*reg, SEEK_SET);
+	usr.card.cartaoCancelado = 'c';
+	fwrite(&usr, sizeof(usr), 1, arq);
+
+}
+
+int excluirFisicamenteCartao (FILE *arqUser, char nome[]){
+	FILE *arqAux = fopen("cadastroAux.dat", "wb");
+	struct tUsuario usr;
+	
+	if(arqAux == NULL){
+		printf("Erro de abertura!!!");
+		return 0;
+	}
+	
+	fseek(arqUser, 0, SEEK_SET);
+	while(fread(&usr, sizeof(usr), 1, arqUser) != 0)
+		if(usr.card.cartaoCancelado != 'c')
+    {
+      fwrite(&usr, sizeof(usr), 1, arqAux);
+    }
+	
+	fclose(arqUser);
+	fclose(arqAux);
+	remove(nome);
+	rename("cadastroAux.dat", nome);
+	
+	return 1;
 }
