@@ -56,6 +56,7 @@ int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
+void lerCarteiraUser(FILE *arq);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 void leValidaUsrName(char[]);
@@ -120,7 +121,7 @@ int menuGerenciamento();
 //MAIN***********************************************************************************************
 int main (void){
   printf("Inicio do programa");
-  FILE *arqCadastro,*arqAdministrador, *arqIngressos; //Modificado hoje no dia 08/05/2021 
+  FILE *arqCadastro,*arqAdministrador, *arqIngressos, *arqCartaoUsuario; //Modificado hoje no dia 08/05/2021 
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
@@ -160,6 +161,7 @@ int main (void){
 						case 1:
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
               listagemIngressos(arqIngressos);
+              
 							break;
 						case 2:
 							//INICIO DO SUB-SUB-MENU PARA PAGAMENTO
@@ -268,7 +270,8 @@ int main (void){
                     posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
                     if(posX==0)
                     {
-                      printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
+                      lerCarteiraUser(arqCadastro);
+                      //printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
                       printf("Digite um valor que deseja adicionar: \n");
                       scanf("%f",&saldoCarteira);
                       usr.valorCarteira+=saldoCarteira;
@@ -369,7 +372,7 @@ int main (void){
 					switch(opcaoSMenuAdm){
 						case 1:
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
-              
+
               listagemIngressos(arqIngressos);
 							
 							break;
@@ -400,10 +403,12 @@ int main (void){
 							break;
 						case 3:
 							printf("\n\n\n*** ALTERAR INGRESSOS ***\n\n\n");
+              
 							
 							break;
 						case 4:
 							printf("\n\n\n*** EXCLUIR INGRESSOS ***\n\n\n");
+
 
 							break;
 						case 5:
@@ -903,10 +908,11 @@ void cancelaCartaoUsr(FILE *arq, int reg)
 
 }
 
-int excluirFisicamenteCartao (FILE *arqUser, char nome[]){
+int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
 	FILE *arqAux = fopen("cadastroAux.dat", "wb");
 	struct tUsuario usr;
 	
+  //não precisa por não ter verificação na main (booleana)
 	if(arqAux == NULL){
 		printf("Erro de abertura!!!");
 		return 0;
@@ -922,7 +928,17 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]){
 	fclose(arqUser);
 	fclose(arqAux);
 	remove(nome);
-	rename("cadastroAux.dat", nome);
+	rename("cadastroAux.dat", nome); // .dat pode dar erro por estar em .cvs na main
 	
 	return 1;
+}
+
+void lerCarteiraUser(FILE *arq)
+{
+   struct tUsuario usr;
+	  fseek(arq, 0, SEEK_SET);
+	  while(fread(&usr,sizeof(usr),1,arq)!=0)
+    {
+      printf("O valor na carteira e de: %0.2f\n",usr.valorCarteira);
+    }
 }
