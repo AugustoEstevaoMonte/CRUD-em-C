@@ -7,7 +7,7 @@
 #include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
 
 //INICIO DAS DEFINIÇÕES*****************************************************************************************
-#define MAX 30
+//DEFINE MAX 30 FICAVA AQUI
 //FIM DAS DEFINIÇÕES*****************************************************************************************
 
 //STRUCT*********************************************************************************************
@@ -57,7 +57,7 @@ int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
-void lerCarteiraUser(FILE *arq);
+void lerCarteiraUser(FILE *arq, struct tUsuario *);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 //void leValidaUsrName(char[]); //Dentro da func
@@ -72,11 +72,11 @@ int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]);
 //void leValidaNomeBanda(char banda[]);
 //void leValidaEstilo(char estilo[]);
 //void leValidaLocal(char local[]);
-int leValidaHorasIni();
-int leValidaMinIni();
-int leValidaHorasFim();
-int leValidaMinFim();
-float leValidaValor();
+//int leValidaHorasIni();
+//int leValidaMinIni();
+//int leValidaHorasFim();
+//int leValidaMinFim();
+//float leValidaValor();
 
 //void leValidaIngressos(int cod, char banda[], int hIni, int mIni, int hFim, int mFim, char local[], float valor);
 
@@ -262,7 +262,7 @@ int main (void){
                     posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
                     if(posX==0)
                     {
-                      lerCarteiraUser(arqCadastro);
+                      lerCarteiraUser(arqCadastro,&usr);
                       //printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
                       printf("Digite um valor que deseja adicionar: \n");
                       scanf("%f",&saldoCarteira);
@@ -564,76 +564,15 @@ int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]) //M
 
 //Aqui ficavam os locais
 
-int leValidaHorasIni()
-{
-    int horas;
-     do
-    {
-        printf("Hora do inicio (apenas a hora): ");
-        fflush(stdin);
-        scanf("%d", &horas);
-        if(horas<1 || horas>24)
-        {
-          printf(ERRO);
-        }
-    }while(horas<1 || horas>24);
-return horas;
-}
+//Aqui ficava o leValidaHorasIni
 
-int leValidaMinIni()
-{
-    int min;
-     do
-    {
-        printf("Minutos do inicio: ");
-        fflush(stdin);
-        scanf("%d", &min);
-        if(min<0 || min>59)
-        {
-          printf(ERRO);
-        }
-    }while(min<0 || min>59);
-return min;
-}
+//aqui ficava o leValidaMinIni
 
-int leValidaHorasFim()
-{
-    int horas;
-     do
-    {
-        printf("Hora do final (apenas a hora): ");
-        fflush(stdin);
-        scanf("%d", &horas);
-        if(horas<1 || horas>24)
-        {
-          printf(ERRO);
-        }
-    }while(horas<1 || horas>24);
-return horas;
-}
+//aqui ficava o leValidaHorasFim
 
-int leValidaMinFim()
-{
-    int min;
-     do
-    {
-        printf("Minutos do final: ");
-        fflush(stdin);
-        scanf("%d", &min);
-        if(min<0 || min>59)
-        {
-          printf(ERRO);
-        }
-    }while(min<0 || min>59);
-return min;
-}
+//Aqui ficava leValidaMinFim
 
-float leValidaValor(){
-  float valor;
-  printf("Valor do ingresso: ");
-  scanf("%f", &valor);
-  return valor;
-}
+//aqui ficava o leValidaValor
 
 
 void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos){
@@ -730,12 +669,11 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
 	return 1;
 }
 
-void lerCarteiraUser(FILE *arq)
+void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
 {
-   struct tUsuario usr;
 	  fseek(arq, 0, SEEK_SET);
-	  while(fread(&usr,sizeof(usr),1,arq)!=0)
+	  while(fread(&(*usr),sizeof(*usr),1,arq)!=0)
     {
-      printf("O valor na carteira e de: %0.2f\n",usr.valorCarteira);
+      printf("O valor na carteira e de: %0.2f\n",(*usr).valorCarteira);
     }
 }
