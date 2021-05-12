@@ -15,6 +15,8 @@ int leValidaMinIni();
 float leValidaValor();
 int leValidaHorasFim();
 int leValidaMinFim();
+int leValidaNumeroCartao(char[]);
+int leValidaCVcard(int cvCard);
 
 
 void leValidaUsrName(char nomeUser[])
@@ -190,5 +192,28 @@ return min;
 }
 
 //FIM DA PARTE RAFAELA, NÃO PADRONIZADA DE ACORDO COM O CÓDIGO
+
+int leValidaNumeroCartao(char num[])
+{
+  if(strlen(num)!=9)
+  {
+    return 1;
+  }
+  return 0;
+}
+
+
+int leValidaCVcard(int cvCard)
+{
+  if(cvCard>=100 && cvCard<=999)
+  {
+    return 0;
+  }
+  else
+  {
+    return 1;
+  }
+}
+
 
 #endif

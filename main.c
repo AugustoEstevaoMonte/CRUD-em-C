@@ -52,8 +52,8 @@ struct tUsuario
 	return usr;
 }
 //FIM DA STRUCT*********************************************************************************************
-int leValidaNumeroCartao(char num[]);
-int leValidaCVcard(int cvCard);
+//int leValidaNumeroCartao(char num[]);//Estou aqui
+//int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
@@ -590,28 +590,8 @@ void listagemIngressos(FILE *arq)
   }
 }
 
-int leValidaNumeroCartao(char num[])
-{
-  if(strlen(num)!=9)
-  {
-    return 1;
-  }
-  return 0;
-}
-
  
 
-int leValidaCVcard(int cvCard)
-{
-  if(cvCard>=100 && cvCard<=999)
-  {
-    return 0;
-  }
-  else
-  {
-    return 1;
-  }
-}
 
 int consultaNumeroCartao(FILE *arq, char busca[])
 {
