@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "menus.h" //Biblioteca criada no dia 11/05 para os "Menus"
+#include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
 
 //INICIO DAS DEFINIÇÕES*****************************************************************************************
-#define ERRO "O dado inserido e invalido!!\n"
 #define MAX 30
 //FIM DAS DEFINIÇÕES*****************************************************************************************
 
@@ -18,7 +19,7 @@ struct tIngressos ////Modificado hoje no dia 08/05/2021
   int horaFim;
   int minFim;
   char banda[MAX];
-  char local[40];
+  char local[MAX];
   float valor;
 };
 
@@ -59,18 +60,18 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
 void lerCarteiraUser(FILE *arq);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
-void leValidaUsrName(char[]);
-void leValidaUsrNickname(char[]);
-void leValidaUsrPassword(char[]);
+//void leValidaUsrName(char[]); //Dentro da func
+//void leValidaUsrNickname(char[]);
+//void leValidaUsrPassword(char[]);
 int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[]);
 int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser[]);
 int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]); 
 //Modificado hoje no dia 07/05/2021
 
-int leValidaCodigo();
-void leValidaNomeBanda(char banda[]);
-void leValidaEstilo(char estilo[]);
-void leValidaLocal(char local[]);
+//int leValidaCodigo();
+//void leValidaNomeBanda(char banda[]);
+//void leValidaEstilo(char estilo[]);
+//void leValidaLocal(char local[]);
 int leValidaHorasIni();
 int leValidaMinIni();
 int leValidaHorasFim();
@@ -98,9 +99,6 @@ void listagemIngressos(FILE*);
 
 //Excluir coisas
 
-//FUNÇÕES USADAS PARA SUBSTITUIR O SYSTEM pause
-void allPause();
-//FUNÇÕES USADAS PARA SUBSTITUIR O SYSTEM pause
 
 
 //INICIO DA FUNÇÃO FILE**************************************************************************************
@@ -110,13 +108,7 @@ FILE *abreArquivo(char nomeArquivo[]);
 
 //SUB-PROGRAMAS**************************************************************************************
 
-//__________MENUS____________________________________________________________________________________
-int menuLogin();
-int menuUser();
-int menuPagamento();
-int menuCarrinho();
-int menuAdm();
-int menuGerenciamento();
+
 
 //MAIN***********************************************************************************************
 int main (void){
@@ -132,7 +124,7 @@ int main (void){
   arqIngressos = abreArquivo("ingressos.csv");
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
 	do{
-	volta: opcaoMenuLogin=menuLogin();  // :volta é usado pela função goto(volta) na linha 125 do CADASTRO, é usado para voltar ao MENU !!!!!!GAMBIARRA ATÉ SURGIR OUTRA SOLUÇÃO MELHOR
+	volta: opcaoMenuLogin = menuLogin();  // :volta é usado pela função goto(volta) na linha 125 do CADASTRO, é usado para voltar ao MENU !!!!!!GAMBIARRA ATÉ SURGIR OUTRA SOLUÇÃO MELHOR
 		//primeiro menu, onde tem:
 		// 1 - Entrar
 		// 2 - Cadastrar
@@ -166,7 +158,7 @@ int main (void){
 						case 2:
 							//INICIO DO SUB-SUB-MENU PARA PAGAMENTO
 							do{
-								opcaoSSMenuPagamento=menuPagamento();
+								opcaoSSMenuPagamento = menuPagamento(); 
 								// 1 - Adicionar cartao
 								// 2 - Retirar cartao
 								// 3 - Adicionar dinheiro na carteira
@@ -293,7 +285,7 @@ int main (void){
 						case 3:
 							do{
 							//INICIO SUB-SUB MENU PARA O CARRINHO
-								opcaoSSMenuCarrinho=menuCarrinho();
+								opcaoSSMenuCarrinho=menuCarrinho(); 
 								// 1 - Ver meu carrinho
 								// 2 - Adicionar item
 								// 3 - Excluir intem
@@ -362,7 +354,7 @@ int main (void){
 				allPause();
 				//INICIO DO SUB-MENU PARA ADMINISTRADOR
 				do{
-					opcaoSMenuAdm=menuAdm();
+					opcaoSMenuAdm = menuAdm(); 
 					// 1 - Ingressos disponiveis
 					// 2 - Adicionar ingresso
 					// 3 - Alterar ingresso
@@ -416,7 +408,7 @@ int main (void){
 							
 							do{
 								//INICIO SU-SUB MENU PARA GERENCIAMENTO DE CONTAS
-								opcaoSSMenuGerenciamento=menuGerenciamento();
+								opcaoSSMenuGerenciamento = menuGerenciamento();
 								// 1 - Usuarios
 								// 2 - Administracao
 								// 3 - Adicionar conta de administrador
@@ -457,185 +449,38 @@ int main (void){
 //MENUs *********************************************************************************************
 
 //______LOGIN________________________________________________________________________________________
-int menuLogin(){
-	int op;
-	do{
-		system("cls");
-		printf("\n\n\n*** LOGIN ***\n\n\n");
-		printf(" 1 - Entrar\n");
-		printf(" 2 - Cadastrar\n");
-		printf(" 3 - Entrar como administrador\n");
-		printf(" 0 - Sair\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>3){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>3);
-	return op;
-}
+//Menu Login ficava aqui
 
 //______USER_________________________________________________________________________________________
 
 //Menu principal - onde tem as opcoes principais para o user
-int menuUser(){
-	int op;
-	do{
-		system("cls");
-		printf("\n\n\n*** ENTRADA ***\n\n\n");
-		printf(" 1 - Ingressos disponiveis\n");
-		printf(" 2 - Formas de pagamento\n");
-		printf(" 3 - Meu carrinho\n");
-		printf(" 0 - Logout\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>3){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>3);
-	return op;
-}
+//Menu user ficava aqui
 
 //Menu de pagamento - onde vai dar pra adicionar cartao e retirar cartao
-int menuPagamento(){
-	int op;
-	do{
-		system("cls");
-		printf("\n\n\n*** FORMAS DE PAGAMENTO ***\n\n\n");
-		printf(" 1 - Adicionar cartao\n");
-		printf(" 2 - Retirar cartao\n");
-		printf(" 3 - Adicionar dinheiro na carteira\n");
-		printf(" 0 - Voltar\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>3){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>3);
-	return op;
-}
+//Aqui ficava o menu pagamento
 
 //Menu do Carrinho - onde o user ve o que tem em seu carrinho, onde adiciona (por codigo de ingresso) o que comprar,
 //exclui e finaliza compra
-int menuCarrinho(){
-	int op;
-	do{
-		system("cls");
-		printf("\n\n\n*** MEU CARRINHO ***\n\n\n");
-		printf(" 1 - Ver meu carrinho\n");
-		printf(" 2 - Adicionar item\n");
-		printf(" 3 - Excluir intem\n");
-		printf(" 4 - Finalizar compra\n");
-		printf(" 0 - Voltar\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>4){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>4);
-	return op;
-}
+//Aqui ficava o Menu carrinho
 
 //______ADMINISTRADOR__________________________________________________________________________________
 
 //Menu principal - onde tem as opcoes principais para o administrador
-int menuAdm(){
-	int op;
-	do{
-		printf("\n\n\n*** MENU DO ADMINISTRADOR ***\n\n\n");
-		printf(" 1 - Ingressos disponiveis\n");
-		printf(" 2 - Adicionar ingresso\n");
-		printf(" 3 - Alterar ingresso\n");
-		printf(" 4 - Excluir ingresso\n");
-		printf(" 5 - Gerenciar contas\n");
-		printf(" 0 - Logout\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>5){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>5);
-	return op;
-}
+//Menu ADM ficava aqui
 
 //Menu de Gerenciamento das contas
-int menuGerenciamento(){
-	int op;
-	do{
-		system("cls");
-		printf("\n\n\n*** GERENCIAMENTO DE CONTAS ***\n\n\n");
-		printf(" 1 - Usuarios\n");
-		printf(" 2 - Administracao\n");
-		printf(" 3 - Adicionar conta de administrador\n");
-		printf(" 4 - excluir conta de administrador\n");
-		printf(" 0 - Voltar\n");
-		printf("\nDigite sua opcao: ");
-		scanf("%d", &op);
-		if(op<0 || op>4){
-			printf(ERRO);
-			allPause();
-		}
-	}while(op<0 || op>4);
-	return op;
-}
+//Aqui ficava o menu gerenciamento
 
 //INICIO DO SISTEMA QUE PEDE O VALIDA O NOME DO USUÁRIO
-void leValidaUsrName(char nomeUser[])
-{
-  do
-  {
-       printf("Digite aqui o seu nome: ");
-       fflush(stdin);
-       fgets(nomeUser,MAX,stdin);
-
-       if(strlen(nomeUser)==1 || strlen(nomeUser)<6)
-       {
-         printf("Nome de usuario invalido, necessita ter pelo menos 6 caracteres...\n");
-       }
-
-  }while(strlen(nomeUser)==1 || strlen(nomeUser)<6);
-}
+//Aqui ficava leValidaUsrName
 //FIM DO SISTEMA QUE PEDE O VALIDA O NOME DO USUÁRIO
 
 //INICIO DO SISTEMA QUE PEDE O VALIDA O NICKNAME
-void leValidaUsrNickname(char nickUser[])
-{
-  do
-  {
-       printf("\nDigite aqui o seu nickname: ");
-       fflush(stdin);
-       fgets(nickUser,MAX,stdin);
-
-       if(strlen(nickUser)==1 || strlen(nickUser)<6)
-       {
-         printf("Nickname invalido, necessita ter pelo menos 6 caracteres...\n");
-       }
-
-  }while(strlen(nickUser)==1 || strlen(nickUser)<6);
-}
+//Aqui ficava a validação do nickname
 //FIM DO SISTEMA QUE PEDE O VALIDA O NICKNAME
 
 //INICIO DO SISTEMA QUE PEDE O VALIDA A SENHA
-void leValidaUsrPassword(char passwordUser[])
-{
-  do
-  {
-       printf("\nDigite aqui o sua senha: ");
-       fflush(stdin);
-       fgets(passwordUser,MAX,stdin);
-
-       if(strlen(passwordUser)==1 || strlen(passwordUser)<6)
-       {
-         printf("Senha invalida, necessita ter pelo menos 6 caracteres...\n");
-       }
-
-  }while(strlen(passwordUser)==1 || strlen(passwordUser)<6);
-}
+//Aqui ficava o leValidaUsrPassword();
 //FIM DO SISTEMA QUE PEDE O VALIDA A SENHA
 
 int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[])
@@ -711,54 +556,13 @@ int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]) //M
   return 1; //  INDICA QUE O NOME DO USUARIO OU SENHA NÃO SÃO IGUAIS
 }
 
-int leValidaCodigo(){
-  int cod;
-  printf("Digite o codigo so show: ");
-  scanf("%d", &cod);
-  return cod;
-}
 
-void leValidaNomeBanda(char banda[])
-{
-   do
-    {
-        printf("\nBanda: ");
-        fflush(stdin);
-        fgets(banda, MAX, stdin);
-        if(strlen(banda)==1)
-        {
-          printf("ERRO");
-        }
-    }while(strlen(banda)==1);
-}
 
-void leValidaEstilo(char estilo[]){
-  do
-    {
-        printf("\nEstilo: ");
-        fflush(stdin);
-        fgets(estilo, 40, stdin);
-        if(strlen(estilo)==1)
-        {
-          printf("ERRO");
-        }
-    }while(strlen(estilo)==1);
-}
+//Aqui ficava o nome da banda
 
-void leValidaLocal(char local[])
-{
-  do
-  {
-      printf("Local do show: ");
-      fflush(stdin);
-      fgets(local, 40, stdin);
-      if(strlen(local)==1)
-      {
-          printf(ERRO);
-      }
-  }while(strlen(local)==1);
+//Aqui ficava os estilos
 
-}
+//Aqui ficavam os locais
 
 int leValidaHorasIni()
 {
@@ -856,14 +660,7 @@ int leValidaNumeroCartao(char num[])
   return 0;
 }
 
-
-void allPause()
-{
-  char allP;
-  printf("Pressione qualquer tecla para continuar...\n");
-  allP = getchar();
-  system("cls||clear");
-}  
+ 
 
 int leValidaCVcard(int cvCard)
 {
