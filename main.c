@@ -747,3 +747,12 @@ void leituraIngresso(FILE *arq)
 	fseek(arq, 0, SEEK_SET);
 	fread(&ingressos,sizeof(ingressos),1,arq);
 }
+
+void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
+{
+	  fseek(arq, 0, SEEK_SET);
+	  while(fread(&(*usr),sizeof(*usr),1,arq)!=0)
+    {
+      printf("O valor na carteira e de: %0.2f\n",(*usr).valorCarteira);
+    }
+}
