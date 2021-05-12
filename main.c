@@ -21,6 +21,7 @@ struct tIngressos ////Modificado hoje no dia 08/05/2021
   char banda[MAX];
   char local[MAX];
   float valor;
+  char cancelado;
 };
 
 struct tAdministrador
@@ -52,12 +53,16 @@ struct tUsuario
 	return usr;
 }
 //FIM DA STRUCT*********************************************************************************************
-//int leValidaNumeroCartao(char num[]);//Estou aqui
+//int leValidaNumeroCartao(char num[]);
 //int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
 void lerCarteiraUser(FILE *arq, struct tUsuario *);
+
+void leituraIngresso(FILE *arq);
+void excluiIngresso(FILE *arq, int reg);
+void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
 
 //INICIO DA  ENTRADA DE DADOS**************************************************************************************
 //void leValidaUsrName(char[]); //Dentro da func
@@ -88,9 +93,11 @@ int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]);
 void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg);
 void gravaDadosArquivoAdministrador(FILE *arq, struct tAdministrador admin); //Modificado hoje no dia 07/05/2021
 void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos);
+void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int reg);
 //FIM DA GRAVAÇÃO DOS ARQUIVOS**************************************************************************************
 //CONSULTA informações
 int consultaNumeroCartao(FILE *arq, char busca[]);
+int consultaIngressos(FILE *arq, int busca);
 
 //CONSULTA INFORMAÇÕES
 
@@ -117,8 +124,8 @@ int main (void){
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
-  char nomeUser,userKey;
-	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX;
+  char nomeUser,userKey, userKey2;
+	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
   float saldoCarteira=0;
 	arqCadastro = abreArquivo("cadastro.csv"); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
   arqIngressos = abreArquivo("ingressos.csv");
@@ -395,11 +402,44 @@ int main (void){
 							break;
 						case 3:
 							printf("\n\n\n*** ALTERAR INGRESSOS ***\n\n\n");
+              //posY = consultaIngressos(arqIngressos,ingressos.codigo);
               
 							
 							break;
 						case 4:
 							printf("\n\n\n*** EXCLUIR INGRESSOS ***\n\n\n");
+
+              printf("Digite aqui o codigo do ingresso que deseja excluir: \n");
+              fscanf(stdin, "%d", &ingressos.codigo);
+
+              posY = consultaIngressos(arqIngressos,ingressos.codigo);
+
+
+              if(posY == 0)
+                    {
+                        leituraIngresso(arqIngressos);
+                        void leituraUsuario(FILE *arq);
+                        printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+                        printf("Deseja excluir o ingresso? (S ou n) \n");
+                        fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                        scanf("%c",&userKey2);
+                        userKey2 = toupper(userKey2);
+                        if(userKey2=='S')
+                        {
+                          //cancelaCartaoUsr(arqCadastro,posX);
+                          excluiIngresso(arqIngressos,posY);
+                          //gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
+                          gravaDadosEspecificoIngressos(arqIngressos, ingressos, posY);
+                          //excluirFisicamenteCartao (arqCadastro,"cadastro.csv");
+                          excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
+                          //printf("Cartao cancelado com sucesso!!!\n");
+                          printf("Ingresso excluído!!!\n");
+                          allPause();
+                        }
+                    } else {
+                      printf("Codigo invalido, tente novamente...\n");
+                      allPause();
+                    }
 
 
 							break;
@@ -649,11 +689,61 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
 	return 1;
 }
 
-void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
+int consultaIngressos(FILE *arq, int busca)
 {
-	  fseek(arq, 0, SEEK_SET);
-	  while(fread(&(*usr),sizeof(*usr),1,arq)!=0)
+  struct tIngressos ingressos;
+  int ind = 0;
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
+  {
+		if(ingressos.codigo == busca)
     {
-      printf("O valor na carteira e de: %0.2f\n",(*usr).valorCarteira);
+      return 0; // 0 representa que achou o numero do cartao
     }
+	}
+	return -1; // -1 representa não encontrado
+}
+
+void excluiIngresso(FILE *arq, int reg)
+{
+	struct tIngressos ingressos;
+	fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
+	ingressos.cancelado = 'c';
+	fwrite(&ingressos, sizeof(ingressos), 1, arq);
+
+}
+
+void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int reg)
+{
+   if(reg == -1){
+		fseek(arq, 0, SEEK_END);
+		fwrite(&ingressos, sizeof(ingressos), 1, arq);
+	}else{
+		fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
+		fwrite(&ingressos, sizeof(ingressos), 1, arq);
+	}
+}
+
+void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra void
+	FILE *arqAux = fopen("ingressosAux.dat", "wb");
+	struct tIngressos ingressos;
+	
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
+		if(ingressos.cancelado != 'c')
+    {
+      fwrite(&ingressos, sizeof(ingressos), 1, arqAux);
+    }
+	
+	fclose(arq);
+	fclose(arqAux);
+	remove(ingresso);
+	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
+}
+
+void leituraIngresso(FILE *arq)
+{
+  struct tIngressos ingressos;
+	fseek(arq, 0, SEEK_SET);
+	fread(&ingressos,sizeof(ingressos),1,arq);
 }
