@@ -67,13 +67,20 @@ void leValidaUsrPassword(char passwordUser[])
   }while(strlen(passwordUser)==1 || strlen(passwordUser)<=5);
 }
 
-//PARTE DA RAFAELA, NÃO PADRONIZADA DE ACORDO COM O CÓDIGO
-int leValidaCodigo() // Não fez a validação
+//PARTE DA RAFAELA
+int leValidaCodigo()
 {
   int cod;
-  printf("Digite o codigo so show: ");
-  scanf("%d", &cod);
+  do{
+    printf("Digite o codigo do show: ");
+    scanf("%d", &cod);
+    if(cod<0)
+      {
+          printf(ERRO);
+      }
+  }while(cod<0);
   return cod;
+
 }
 
 void leValidaNomeBanda(char banda[])
@@ -83,24 +90,11 @@ void leValidaNomeBanda(char banda[])
         printf("\nBanda: ");
         fflush(stdin);
         fgets(banda, MAX, stdin);
-        if(strlen(banda)==1)
+        if(strlen(banda)<=3)
         {
           printf(ERRO);
         }
-    }while(strlen(banda)==1);
-}
-
-void leValidaEstilo(char estilo[]){
-  do
-    {
-        printf("\nEstilo: ");
-        fflush(stdin);
-        fgets(estilo, 40, stdin);
-        if(strlen(estilo)==1)
-        {
-          printf(ERRO);
-        }
-    }while(strlen(estilo)==1);
+    }while(strlen(banda)<=3);
 }
 
 void leValidaLocal(char local[])
@@ -110,11 +104,11 @@ void leValidaLocal(char local[])
       printf("Local do show: ");
       fflush(stdin);
       fgets(local, MAX, stdin);
-      if(strlen(local)==1)
+      if(strlen(local)<=5)
       {
           printf(ERRO);
       }
-  }while(strlen(local)==1);
+  }while(strlen(local)<=5);
 
 }
 
@@ -151,11 +145,18 @@ int leValidaMinIni()
 return min;
 }
 
-float leValidaValor() //Não fez a validação
+float leValidaValor()
 {
   float valor;
-  printf("Valor do ingresso: ");
-  scanf("%f", &valor);
+  do{
+    printf("Valor do ingresso: ");
+    scanf("%f", &valor);
+    if(valor<0.0)
+        {
+          printf(ERRO);
+        }
+  }while(valor<0.0);
+
   return valor;
 }
 
@@ -191,7 +192,7 @@ int leValidaMinFim()
 return min;
 }
 
-//FIM DA PARTE RAFAELA, NÃO PADRONIZADA DE ACORDO COM O CÓDIGO
+//FIM DA PARTE RAFAELA
 
 int leValidaNumeroCartao(char num[])
 {

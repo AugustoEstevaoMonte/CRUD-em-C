@@ -28,6 +28,7 @@ struct tAdministrador
 {
 	char adminName[MAX];
 	char adminPassword[MAX];
+  char cancelado;
 };
 
 struct tCartaoUsr
@@ -71,17 +72,7 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
 int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[]);
 int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser[]);
 int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]); 
-//Modificado hoje no dia 07/05/2021
-
-//int leValidaCodigo();
-//void leValidaNomeBanda(char banda[]);
-//void leValidaEstilo(char estilo[]);
-//void leValidaLocal(char local[]);
-//int leValidaHorasIni();
-//int leValidaMinIni();
-//int leValidaHorasFim();
-//int leValidaMinFim();
-//float leValidaValor();
+//Modificado hoje no dia 07/05/202
 
 //void leValidaIngressos(int cod, char banda[], int hIni, int mIni, int hFim, int mFim, char local[], float valor);
 
@@ -98,6 +89,7 @@ void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int r
 //CONSULTA informações
 int consultaNumeroCartao(FILE *arq, char busca[]);
 int consultaIngressos(FILE *arq, int busca);
+int consultaAdmin(FILE *arq, char buscaAdmin[]);
 
 //CONSULTA INFORMAÇÕES
 
@@ -106,12 +98,14 @@ void listagemIngressos(FILE*);
 
 //Excluir coisas
 
-
-
+void listarUsuarios(FILE *arq);
+void listarAdmin(FILE *arq);
+void cancelaAdmin(FILE *arq, int reg);
 //INICIO DA FUNÇÃO FILE**************************************************************************************
 FILE *abreArquivo(char nomeArquivo[]);
+int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
 //FIM  DA FUNÇÃO FILE**************************************************************************************
-
+void lerAdministrador(FILE *arq, struct tAdministrador *adm, char nomeAd[]);
 
 //SUB-PROGRAMAS**************************************************************************************
 
@@ -457,19 +451,59 @@ int main (void){
 								switch(opcaoSSMenuGerenciamento){
 									case 1:
 										printf("\n\n\n*** USUARIOS ***\n\n\n");
+                    listarUsuarios(arqCadastro);
 										allPause();
 										break;
 									case 2:
 										printf("\n\n\n*** ADMINISTRACAO ***\n\n\n");
+                    listarAdmin(arqAdministrador);
 										allPause();
 										break;
 									case 3:
 										printf("\n\n\n*** ADICIONAR CONTA DE ADMINISTRADOR ***\n\n\n");
+                    leValidaUsrName(admin.adminName);
+					          leValidaUsrPassword(admin.adminPassword);
+					          gravaDadosArquivoAdministrador(arqAdministrador,admin);
+                    printf("CONTA CRIADA COM SUCESSO!!!\n");
 										allPause();
 										break;
 									case 4:
-										printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
-										allPause();
+                  //DEU ERRO NÃO ROLOU
+										/*printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
+                    printf("Digite aqui o nome do administrador(a)...\n");
+                    do
+                    {
+                      printf("Digite aqui o nome do Adm para ser excluido: \n");
+                      fgets(admin.adminName,MAX,stdin);
+                      if(strlen(admin.adminName)==1 || strlen(admin.adminName)<=5)
+                      {
+                        printf(ERRO);
+                      } 
+                    }while(strlen(admin.adminName)==1 || strlen(admin.adminName)<=5);
+                    posX = consultaAdmin(arqAdministrador,admin.adminName);
+                    if(posX==0)
+                    {
+                      printf("ADMINISTRADOR ENCONTRADO!!!\n");
+                      lerAdministrador(arqAdministrador,&admin,admin.adminName);
+                      printf("Deseja remover o administrador(a) ? (S ou n) \n");
+                      fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                      scanf("%c",&userKey);
+                      userKey = toupper(userKey);
+                      if(userKey=='S')
+                      {
+                          cancelaAdmin(arqAdministrador,posX);
+                          gravaDadosArquivoAdministrador(arqAdministrador,admin);
+                          excluirFisicamenteAdmin(arqAdministrador,"admin.csv");
+                          printf("ADMINISTRADOR REMOVIDO COM SUCESSO!!!\n");
+                          allPause();
+                      }else{
+                        printf(ERRO);
+                      }
+
+                    }else{
+                      printf(ERRO);
+                    }
+										allPause();*/
 										break;
 									
 								}
@@ -485,43 +519,6 @@ int main (void){
 	fclose(arqAdministrador);
 	return 0;
 }
-
-//MENUs *********************************************************************************************
-
-//______LOGIN________________________________________________________________________________________
-//Menu Login ficava aqui
-
-//______USER_________________________________________________________________________________________
-
-//Menu principal - onde tem as opcoes principais para o user
-//Menu user ficava aqui
-
-//Menu de pagamento - onde vai dar pra adicionar cartao e retirar cartao
-//Aqui ficava o menu pagamento
-
-//Menu do Carrinho - onde o user ve o que tem em seu carrinho, onde adiciona (por codigo de ingresso) o que comprar,
-//exclui e finaliza compra
-//Aqui ficava o Menu carrinho
-
-//______ADMINISTRADOR__________________________________________________________________________________
-
-//Menu principal - onde tem as opcoes principais para o administrador
-//Menu ADM ficava aqui
-
-//Menu de Gerenciamento das contas
-//Aqui ficava o menu gerenciamento
-
-//INICIO DO SISTEMA QUE PEDE O VALIDA O NOME DO USUÁRIO
-//Aqui ficava leValidaUsrName
-//FIM DO SISTEMA QUE PEDE O VALIDA O NOME DO USUÁRIO
-
-//INICIO DO SISTEMA QUE PEDE O VALIDA O NICKNAME
-//Aqui ficava a validação do nickname
-//FIM DO SISTEMA QUE PEDE O VALIDA O NICKNAME
-
-//INICIO DO SISTEMA QUE PEDE O VALIDA A SENHA
-//Aqui ficava o leValidaUsrPassword();
-//FIM DO SISTEMA QUE PEDE O VALIDA A SENHA
 
 int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[])
 {
@@ -578,7 +575,7 @@ int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser
 
 void gravaDadosArquivoAdministrador(FILE *arq, struct tAdministrador admin) //Modificado hoje no dia 07/05/2021
 {
-		fseek(arq, 0, SEEK_END);
+		fseek(arq, 0, SEEK_END); 
 		fwrite(&admin, sizeof(admin), 1, arq);
 }
 
@@ -595,24 +592,6 @@ int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]) //M
 	}
   return 1; //  INDICA QUE O NOME DO USUARIO OU SENHA NÃO SÃO IGUAIS
 }
-
-
-
-//Aqui ficava o nome da banda
-
-//Aqui ficava os estilos
-
-//Aqui ficavam os locais
-
-//Aqui ficava o leValidaHorasIni
-
-//aqui ficava o leValidaMinIni
-
-//aqui ficava o leValidaHorasFim
-
-//Aqui ficava leValidaMinFim
-
-//aqui ficava o leValidaValor
 
 
 void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos){
@@ -636,7 +615,6 @@ void listagemIngressos(FILE *arq)
 int consultaNumeroCartao(FILE *arq, char busca[])
 {
   struct tUsuario usr;
-  int ind = 0;
 	fseek(arq, 0, SEEK_SET);
 	while(fread(&usr, sizeof(usr), 1, arq) != 0)
   {
@@ -665,7 +643,7 @@ void cancelaCartaoUsr(FILE *arq, int reg)
 }
 
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
-	FILE *arqAux = fopen("cadastroAux.dat", "wb");
+	FILE *arqAux = fopen("cadastroAux.csv", "wb");
 	struct tUsuario usr;
 	
   //não precisa por não ter verificação na main (booleana)
@@ -684,7 +662,7 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
 	fclose(arqUser);
 	fclose(arqAux);
 	remove(nome);
-	rename("cadastroAux.dat", nome); // .dat pode dar erro por estar em .cvs na main
+	rename("cadastroAux.csv", nome); //
 	
 	return 1;
 }
@@ -755,4 +733,86 @@ void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
     {
       printf("O valor na carteira e de: %0.2f\n",(*usr).valorCarteira);
     }
+}
+
+void listarUsuarios(FILE *arq)
+{
+  struct tUsuario usr;
+  fseek(arq,0,SEEK_SET);
+  while(fread(&usr,sizeof(usr),1,arq)!=0)
+  {
+    printf("Nome do usuario: %s\nNickName Usuario: %s\n",usr.usrName,usr.usrNickName);
+    getchar();
+  }
+}
+
+void listarAdmin(FILE *arq)
+{
+  struct tAdministrador adm;
+  fseek(arq,0,SEEK_SET);
+  while(fread(&adm,sizeof(adm),1,arq)!=0)
+  {
+    printf("Nome do administrador: %s\nSenha do administrador: %s\n",adm.adminName,adm.adminPassword);
+    getchar();
+  }
+}
+
+int consultaAdmin(FILE *arq, char buscaAdmin[])
+{
+  struct tAdministrador adm;
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&adm, sizeof(adm), 1, arq) != 0)
+  {
+		if(strcmp(buscaAdmin,adm.adminName)==0)
+    {
+      return 0; // 0 representa que achou o numero do cartao
+    }
+	}
+	return -1; // -1 representa não encontrado
+}
+
+void lerAdministrador(FILE *arq, struct tAdministrador *adm, char nomeAd[])
+{
+    fseek(arq, 0, SEEK_SET);
+	  while(fread(&(*adm),sizeof(*adm),1,arq)!=0)
+    {
+      if(strcmp(nomeAd,(*adm).adminName)==0)
+      {
+        printf("Nome do administrador(a): %s\n",(*adm).adminName);
+      }
+    }
+}
+
+void cancelaAdmin(FILE *arq, int reg)
+{
+	struct tAdministrador adm;
+	fseek(arq, sizeof(adm)*reg, SEEK_SET);
+	adm.cancelado='c';
+	fwrite(&adm, sizeof(adm), 1, arq);
+
+}
+
+int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[])
+{
+  FILE *arqAux = fopen("adminAux.csv", "w+b");
+	struct tAdministrador admin;
+	
+	if(arqAux == NULL){
+		printf("Erro de abertura!!!");
+		return 0;
+	}
+	
+	fseek(arqAdm, 0, SEEK_END);
+	while(fread(&admin, sizeof(admin), 1, arqAdm) != 0)
+		if(admin.cancelado != 'c')
+    {
+      fwrite(&admin, sizeof(admin), 1, arqAux);
+    }
+	
+	fclose(arqAdm);
+	fclose(arqAux);
+	remove(nomeArq);
+	rename("adminAux.csv", nomeArq); // .dat pode dar erro por estar em .cvs na main
+	
+	return 1;
 }
