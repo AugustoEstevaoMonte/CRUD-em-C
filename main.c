@@ -5,104 +5,23 @@
 #include <ctype.h>
 #include "menus.h" //Biblioteca criada no dia 11/05 para os "Menus"
 #include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
+#include "structs.h" //Biblioteca contendo structs | OBS: ELA SEMPRE DEVE ESTAR EM PRIMEIRO NA INCLUSAO |
+#include "gravacoes.h" //Biblioteca contendo funções de gravação
+#include "listagem.h" //Biblioteca contendo funções de listagem
+#include "leitura.h" //Biblioteca contendo funções de leitura
+#include "verificacoes.h"
 
-//INICIO DAS DEFINIÇÕES*****************************************************************************************
-//DEFINE MAX 30 FICAVA AQUI
-//FIM DAS DEFINIÇÕES*****************************************************************************************
 
-//STRUCT*********************************************************************************************
-struct tIngressos ////Modificado hoje no dia 08/05/2021
-{ 
-	int codigo;
-  int horaIni;
-  int minIni;
-  int horaFim;
-  int minFim;
-  char banda[MAX];
-  char local[MAX];
-  float valor;
-  char cancelado;
-};
-
-struct tAdministrador
-{
-	char adminName[MAX];
-	char adminPassword[MAX];
-  char cancelado;
-};
-
-struct tCartaoUsr
-{
-  char usrNumCartao[MAX];
-  int cvCard;
-  char cartaoCancelado;
-};
-
-struct tUsuario
-{
-  char usrName[MAX];
-  char usrPassword[MAX];
-  char usrNickName[MAX];
-  struct tCartaoUsr card;
-  float valorCarteira;
-};
-struct tUsuario lerUser(int reg, FILE *arq);
-//FIM DA STRUCT*********************************************************************************************
-//int leValidaNumeroCartao(char num[]);
-//int leValidaCVcard(int cvCard);
-void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE **arqUser, char nome[]); // 2 asteriscos em arq
-void lerCarteiraUser(FILE *arq, struct tUsuario *);
-
-void leituraIngresso(FILE *arq, int busca);
 void excluiIngresso(FILE *arq, int reg);
 void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
-
-//INICIO DA  ENTRADA DE DADOS**************************************************************************************
-//void leValidaUsrName(char[]); //Dentro da func
-//void leValidaUsrNickname(char[]);
-//void leValidaUsrPassword(char[]);
-int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[]);
-int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser[]);
-int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]); 
-//Modificado hoje no dia 07/05/202
-
-//void leValidaIngressos(int cod, char banda[], int hIni, int mIni, int hFim, int mFim, char local[], float valor);
-
-//FIM DA  ENTRADA DE DADOS**************************************************************************************
-
-
-
-//INICIO DA GRAVAÇÃO DOS ARQUIVOS**************************************************************************************
-void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg);
-void gravaDadosArquivoAdministrador(FILE *arq, struct tAdministrador admin); //Modificado hoje no dia 07/05/2021
-void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos);
-void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int reg);
-//FIM DA GRAVAÇÃO DOS ARQUIVOS**************************************************************************************
-//CONSULTA informações
 int consultaNumeroCartao(FILE *arq, char busca[]);
 int consultaIngressos(FILE *arq, int busca);
 int consultaAdmin(FILE *arq, char buscaAdmin[]);
-
-//CONSULTA INFORMAÇÕES
-
-//Mostrar as informações dos ARQUIVOS
-void listagemIngressos(FILE*);
-
-//Excluir coisas
-
-void listarUsuarios(FILE *arq);
-void listarAdmin(FILE *arq);
 void cancelaAdmin(FILE *arq, int reg);
-//INICIO DA FUNÇÃO FILE**************************************************************************************
 FILE *abreArquivo(char nomeArquivo[]);
 int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
-//FIM  DA FUNÇÃO FILE**************************************************************************************
-void lerAdministrador(FILE *arq, struct tAdministrador *adm, char nomeAd[]);
-
-//SUB-PROGRAMAS**************************************************************************************
-
 
 
 //MAIN***********************************************************************************************
@@ -115,8 +34,13 @@ int main (void){
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
   float saldoCarteira=0;
-	arqCadastro = abreArquivo("cadastro.csv"); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
+
+
+	arqCadastro = abreArquivo("cadastro.csv"); 
   arqIngressos = abreArquivo("ingressos.csv");
+  arqCartaoUsuario = abreArquivo("infoCartao.csv");
+
+
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
 	do{
 	volta: opcaoMenuLogin = menuLogin();  // :volta é usado pela função goto(volta) na linha 125 do CADASTRO, é usado para voltar ao MENU !!!!!!GAMBIARRA ATÉ SURGIR OUTRA SOLUÇÃO MELHOR
@@ -173,7 +97,8 @@ int main (void){
                           }
 
                     }while(erroFunc==1);
-                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
+
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX==-1)
                     {
                         do
@@ -189,7 +114,7 @@ int main (void){
 										  }while(erroFunc==1);
 
 
-                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
+                        gravaDadosNoArquivoUsuario(arqCartaoUsuario,usr,-1);
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
                         printf("CV cartao: %d\n",usr.card.cvCard);
@@ -217,20 +142,20 @@ int main (void){
                       
                     }while(erroFunc==1);
 
-                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
                     {
-                        usr = lerUser(posX, arqCadastro);
-                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao); //Bug ele não exclui o cartão
+                        usr = lerUser(posX, arqCartaoUsuario);
+                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao); 
                         printf("Deseja remover o cartao? (S ou n) \n");
-                        fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                        fflush(stdin); 
                         scanf("%c",&userKey);
                         userKey = toupper(userKey);
                         if(userKey=='S')
                         {
-                          cancelaCartaoUsr(arqCadastro,posX);
-                          gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
-                          excluirFisicamenteCartao (&arqCadastro,"cadastro.csv");
+                          cancelaCartaoUsr(arqCartaoUsuario,posX);
+                          gravaDadosNoArquivoUsuario(arqCartaoUsuario,usr,posX);
+                          excluirFisicamenteCartao (&arqCartaoUsuario,"cadastro.csv");
                           printf("Cartao cancelado com sucesso!!!\n");
                           allPause();
                         }
@@ -254,16 +179,16 @@ int main (void){
                       }
                       
                     }while(erroFunc==1);
-                    posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
-                    if(posX>0)
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
+                    if(posX > 0)
                     {
-                      lerCarteiraUser(arqCadastro,&usr);
+                      lerCarteiraUser(arqCartaoUsuario,&usr);
                       //printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
                       printf("Digite um valor que deseja adicionar: \n");
                       scanf("%f",&saldoCarteira);
                       usr.valorCarteira+=saldoCarteira;
                       printf("VALOR ADICIONADO COM SUCESSO!!\n");
-                      gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
+                      gravaDadosNoArquivoUsuario(arqCartaoUsuario,usr,posX);
                       allPause();
                     } else{
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
@@ -510,22 +435,11 @@ int main (void){
 
 	fclose(arqCadastro); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
 	fclose(arqAdministrador);
+  fclose(arqCartaoUsuario);
 	return 0;
 }
 
-int verificaNicknameJaEstaEmUso(FILE *arq, char nickUsername[])
-{
-  struct tUsuario usr;
-  fseek(arq, 0, SEEK_SET);
-	while(fread(&usr, sizeof(usr), 1, arq) != 0)
-  {
-		if(strcmp(nickUsername,usr.usrNickName) == 0)
-    {
-      return 1; //INDICA QUE JÁ TEM UM NICKNAME CADASTRADO
-    }
-	}
-  return 0;
-}
+
 
 //INICIO DO FILE
 FILE *abreArquivo(char nomeArquivo[])
@@ -540,68 +454,6 @@ FILE *abreArquivo(char nomeArquivo[])
 	return arq;
 }
 //FIM  DO FILE
-
-void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg) //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
-{
-   if(reg == -1){
-    usr.card.cartaoCancelado=' ';
-		fseek(arq, 0, SEEK_END);
-		fwrite(&usr, sizeof(usr), 1, arq);
-	}else{
-		fseek(arq, sizeof(usr)*reg, SEEK_SET);
-		fwrite(&usr, sizeof(usr), 1, arq);
-	}
-}
-
-int verificaSeLoginEsenhaCorrespondem(FILE *arq, char nomeUser[], char senhaUser[])
-{
-  struct tUsuario usr;
-   fseek(arq, 0, SEEK_SET);
-	while(fread(&usr, sizeof(usr), 1, arq) != 0)
-  {
-		if((strcmp(nomeUser,usr.usrNickName) == 0) && strcmp(senhaUser,usr.usrPassword)==0)
-    {
-      return 0; //INDICA QUE O NOME DO USUARIO & SENHA SÃO IGUAIS AS CADASTRADAS
-    }
-	}
-  return 1; //  INDICA QUE O NOME DO USUARIO OU SENHA NÃO SÃO IGUAIS
-}
-
-void gravaDadosArquivoAdministrador(FILE *arq, struct tAdministrador admin) //Modificado hoje no dia 07/05/2021
-{
-		fseek(arq, 0, SEEK_END); 
-		fwrite(&admin, sizeof(admin), 1, arq);
-}
-
-int verificaUsuarioAdminEsenha(FILE *arq, char nomeUser[], char senhaUser[]) //Modificado hoje no dia 07/05/2021
-{
-  struct tAdministrador admin;
-   fseek(arq, 0, SEEK_SET);
-	while(fread(&admin, sizeof(admin), 1, arq) != 0)
-  {
-		if((strcmp(nomeUser,admin.adminName) == 0) && strcmp(senhaUser,admin.adminPassword)==0)
-    {
-      return 0; //INDICA QUE O NOME DO USUARIO & SENHA SÃO IGUAIS AS CADASTRADAS
-    }
-	}
-  return 1; //  INDICA QUE O NOME DO USUARIO OU SENHA NÃO SÃO IGUAIS
-}
-
-
-void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos){
-    fseek(arq, 0, SEEK_END);
-		fwrite(&ingressos, sizeof(ingressos), 1, arq);
-}
-
-void listagemIngressos(FILE *arq)
-{
-  struct tIngressos ingressos;
-  fseek(arq, 0, SEEK_SET);
-  while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
-  {
-      printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-  }
-}
 
 
 int consultaNumeroCartao(FILE *arq, char busca[])
@@ -620,12 +472,7 @@ int consultaNumeroCartao(FILE *arq, char busca[])
 	return -1; // -1 representa não encontrado
 }
 
-void leituraUsuario(FILE *arq)
-{
-  struct tUsuario usr;
-	fseek(arq, 0, SEEK_SET);
-	fread(&usr,sizeof(usr),1,arq);
-}
+
 
 void cancelaCartaoUsr(FILE *arq, int reg)
 {
@@ -688,16 +535,6 @@ void excluiIngresso(FILE *arq, int reg)
 
 }
 
-void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int reg)
-{
-   if(reg == -1){
-		fseek(arq, 0, SEEK_END);
-		fwrite(&ingressos, sizeof(ingressos), 1, arq);
-	}else{
-		fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
-		fwrite(&ingressos, sizeof(ingressos), 1, arq);
-	}
-}
 
 void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra void
 	FILE *arqAux = fopen("ingressosAux.dat", "wb");
@@ -716,57 +553,7 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra vo
 	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
 }
 
-void leituraIngresso(FILE *arq, int busca)
-{
-  struct tIngressos ingressos;
-	fseek(arq, 0, SEEK_SET);
-  while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0){
-		if(ingressos.codigo == busca){
-      return;
-    }
-	}
-  //leitura de arquivo - abre o arquivo, passa pelas informações que estão nele, imprime o que voce quer imprimir de acordo com os comandos
-	
-}
 
-void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
-{
-	  fseek(arq, 0, SEEK_SET);
-	  while(fread(&(*usr),sizeof(*usr),1,arq)!=0)
-    {
-      printf("O valor na carteira e de: %0.2f\n",(*usr).valorCarteira);
-    }
-}
-
-void listarUsuarios(FILE *arq)
-{
-  struct tUsuario usr;
-  fseek(arq,0,SEEK_SET);
-  while(fread(&usr,sizeof(usr),1,arq)!=0)
-  {
-    printf("Nome do usuario: %s\nNickName Usuario: %s\n",usr.usrName,usr.usrNickName);
-    getchar();
-  }
-}
-
-void listarAdmin(FILE *arq)
-{
-  struct tAdministrador adm;
-  fseek(arq,0,SEEK_SET);
-  while(fread(&adm,sizeof(adm),1,arq)!=0)
-  {
-    printf("Nome do administrador: %s\nSenha do administrador: %s\n",adm.adminName,adm.adminPassword);
-    getchar();
-  }
-}
-
-struct tUsuario lerUser(int reg, FILE *arq)
-{
-  struct tUsuario usr;
-  fseek(arq,(reg-1)*sizeof(struct tUsuario),SEEK_SET);
-  fread(&usr,sizeof(usr),1,arq);
-  return usr;
-}
 
 
 
