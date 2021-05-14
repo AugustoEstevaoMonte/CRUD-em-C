@@ -46,19 +46,13 @@ struct tUsuario
   struct tCartaoUsr card;
   float valorCarteira;
 };
-
-  struct tUsuario lerDadosUsr (int posicao, FILE *arq){
-	struct tUsuario usr;
-	fseek(arq, sizeof(usr)*posicao, SEEK_SET);
-	fread(&usr, sizeof(usr), 1, arq);
-	return usr;
-}
+struct tUsuario lerUser(int reg, FILE *arq);
 //FIM DA STRUCT*********************************************************************************************
 //int leValidaNumeroCartao(char num[]);
 //int leValidaCVcard(int cvCard);
 void leituraUsuario(FILE *arq);
 void cancelaCartaoUsr(FILE *arq, int reg);
-int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
+int excluirFisicamenteCartao (FILE **arqUser, char nome[]); // 2 asteriscos em arq
 void lerCarteiraUser(FILE *arq, struct tUsuario *);
 
 void leituraIngresso(FILE *arq, int busca);
@@ -195,7 +189,7 @@ int main (void){
 										  }while(erroFunc==1);
 
 
-                        gravaDadosNoArquivoUsuario(arqCadastro,usr,0);
+                        gravaDadosNoArquivoUsuario(arqCadastro,usr,-1);
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
                         printf("CV cartao: %d\n",usr.card.cvCard);
@@ -224,10 +218,10 @@ int main (void){
                     }while(erroFunc==1);
 
                     posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
-                    if(posX == 0)
+                    if(posX > 0)
                     {
-                        leituraUsuario(arqCadastro);
-                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao);
+                        usr = lerUser(posX, arqCadastro);
+                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao); //Bug ele não exclui o cartão
                         printf("Deseja remover o cartao? (S ou n) \n");
                         fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
                         scanf("%c",&userKey);
@@ -236,7 +230,7 @@ int main (void){
                         {
                           cancelaCartaoUsr(arqCadastro,posX);
                           gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
-                          excluirFisicamenteCartao (arqCadastro,"cadastro.csv");
+                          excluirFisicamenteCartao (&arqCadastro,"cadastro.csv");
                           printf("Cartao cancelado com sucesso!!!\n");
                           allPause();
                         }
@@ -261,7 +255,7 @@ int main (void){
                       
                     }while(erroFunc==1);
                     posX = consultaNumeroCartao(arqCadastro,usr.card.usrNumCartao);
-                    if(posX==0)
+                    if(posX>0)
                     {
                       lerCarteiraUser(arqCadastro,&usr);
                       //printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
@@ -275,7 +269,6 @@ int main (void){
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                       allPause();
                     }
-                    printf("Valor recebeu: %0.2f\n",usr.valorCarteira);
                     
 										allPause();
 										break;
@@ -551,6 +544,7 @@ FILE *abreArquivo(char nomeArquivo[])
 void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg) //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
 {
    if(reg == -1){
+    usr.card.cartaoCancelado=' ';
 		fseek(arq, 0, SEEK_END);
 		fwrite(&usr, sizeof(usr), 1, arq);
 	}else{
@@ -613,12 +607,14 @@ void listagemIngressos(FILE *arq)
 int consultaNumeroCartao(FILE *arq, char busca[])
 {
   struct tUsuario usr;
+  int reg = 0;
 	fseek(arq, 0, SEEK_SET);
 	while(fread(&usr, sizeof(usr), 1, arq) != 0)
   {
-		if(strcmp(busca,usr.card.usrNumCartao)==0)
+    reg++;
+		if(strcmp(busca,usr.card.usrNumCartao)==0 && (usr.card.cartaoCancelado!='c'))
     {
-      return 0; // 0 representa que achou o numero do cartao
+      return reg; // 0 representa que achou o numero do cartao
     }
 	}
 	return -1; // -1 representa não encontrado
@@ -634,14 +630,16 @@ void leituraUsuario(FILE *arq)
 void cancelaCartaoUsr(FILE *arq, int reg)
 {
 	struct tUsuario usr;
-	fseek(arq, sizeof(usr)*reg, SEEK_SET);
+	fseek(arq, (reg-1)*sizeof(usr), SEEK_SET);
+  fread(&usr,sizeof(usr),1,arq);
 	usr.card.cartaoCancelado = 'c';
+  fseek(arq,-sizeof(usr), SEEK_CUR);
 	fwrite(&usr, sizeof(usr), 1, arq);
 
 }
 
-int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
-	FILE *arqAux = fopen("cadastroAux.csv", "wb");
+int excluirFisicamenteCartao (FILE **arqUser, char nome[]){//mudar int pra void
+	FILE *arqAux = fopen("cadastroAux.csv", "w+b");
 	struct tUsuario usr;
 	
   //não precisa por não ter verificação na main (booleana)
@@ -650,14 +648,14 @@ int excluirFisicamenteCartao (FILE *arqUser, char nome[]){//mudar int pra void
 		return 0;
 	}
 	
-	fseek(arqUser, 0, SEEK_SET);
-	while(fread(&usr, sizeof(usr), 1, arqUser) != 0)
+	fseek((*arqUser), 0, SEEK_SET);
+	while(fread(&usr, sizeof(usr), 1, (*arqUser)) != 0)
 		if(usr.card.cartaoCancelado != 'c')
     {
       fwrite(&usr, sizeof(usr), 1, arqAux);
     }
 	
-	fclose(arqUser);
+	fclose((*arqUser));
 	fclose(arqAux);
 	remove(nome);
 	rename("cadastroAux.csv", nome); //
@@ -761,62 +759,18 @@ void listarAdmin(FILE *arq)
   }
 }
 
-int consultaAdmin(FILE *arq, char buscaAdmin[])
+struct tUsuario lerUser(int reg, FILE *arq)
 {
-  struct tAdministrador adm;
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&adm, sizeof(adm), 1, arq) != 0)
-  {
-		if(strcmp(buscaAdmin,adm.adminName)==0)
-    {
-      return 0; // 0 representa que achou o numero do cartao
-    }
-	}
-	return -1; // -1 representa não encontrado
+  struct tUsuario usr;
+  fseek(arq,(reg-1)*sizeof(struct tUsuario),SEEK_SET);
+  fread(&usr,sizeof(usr),1,arq);
+  return usr;
 }
 
-void lerAdministrador(FILE *arq, struct tAdministrador *adm, char nomeAd[])
-{
-    fseek(arq, 0, SEEK_SET);
-	  while(fread(&(*adm),sizeof(*adm),1,arq)!=0)
-    {
-      if(strcmp(nomeAd,(*adm).adminName)==0)
-      {
-        printf("Nome do administrador(a): %s\n",(*adm).adminName);
-      }
-    }
-}
 
-void cancelaAdmin(FILE *arq, int reg)
-{
-	struct tAdministrador adm;
-	fseek(arq, sizeof(adm)*reg, SEEK_SET);
-	adm.cancelado='c';
-	fwrite(&adm, sizeof(adm), 1, arq);
 
-}
 
-int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[])
-{
-  FILE *arqAux = fopen("adminAux.csv", "w+b");
-	struct tAdministrador admin;
-	
-	if(arqAux == NULL){
-		printf("Erro de abertura!!!");
-		return 0;
-	}
-	
-	fseek(arqAdm, 0, SEEK_END);
-	while(fread(&admin, sizeof(admin), 1, arqAdm) != 0)
-		if(admin.cancelado != 'c')
-    {
-      fwrite(&admin, sizeof(admin), 1, arqAux);
-    }
-	
-	fclose(arqAdm);
-	fclose(arqAux);
-	remove(nomeArq);
-	rename("adminAux.csv", nomeArq); // .dat pode dar erro por estar em .cvs na main
-	
-	return 1;
-}
+
+
+
+
