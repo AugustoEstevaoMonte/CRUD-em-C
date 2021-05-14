@@ -61,7 +61,7 @@ void cancelaCartaoUsr(FILE *arq, int reg);
 int excluirFisicamenteCartao (FILE *arqUser, char nome[]);
 void lerCarteiraUser(FILE *arq, struct tUsuario *);
 
-void leituraIngresso(FILE *arq);
+void leituraIngresso(FILE *arq, int busca);
 void excluiIngresso(FILE *arq, int reg);
 void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
 
@@ -411,8 +411,8 @@ int main (void){
 
               if(posY == 0)
                     {
-                        leituraIngresso(arqIngressos);
-                        void leituraUsuario(FILE *arq);
+                        leituraIngresso(arqIngressos, ingressos.codigo);
+                        //void leituraUsuario(FILE *arq);
                         printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
                         printf("Deseja excluir o ingresso? (S ou n) \n");
                         fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
@@ -602,14 +602,12 @@ void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos){
 void listagemIngressos(FILE *arq)
 {
   struct tIngressos ingressos;
-  fseek(arq, 0, SEEK_SET); //fseek tá certo, é outro erro
+  fseek(arq, 0, SEEK_SET);
   while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
   {
       printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
   }
 }
-
- 
 
 
 int consultaNumeroCartao(FILE *arq, char busca[])
@@ -719,11 +717,17 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra vo
 	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
 }
 
-void leituraIngresso(FILE *arq)
+void leituraIngresso(FILE *arq, int busca)
 {
   struct tIngressos ingressos;
 	fseek(arq, 0, SEEK_SET);
-	fread(&ingressos,sizeof(ingressos),1,arq);
+  while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0){
+		if(ingressos.codigo == busca){
+      return;
+    }
+	}
+  //leitura de arquivo - abre o arquivo, passa pelas informações que estão nele, imprime o que voce quer imprimir de acordo com os comandos
+	
 }
 
 void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
