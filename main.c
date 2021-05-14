@@ -659,6 +659,7 @@ int excluirFisicamenteCartao (FILE **arqUser, char nome[]){//mudar int pra void
 	fclose(arqAux);
 	remove(nome);
 	rename("cadastroAux.csv", nome); //
+  (*arqUser) = abreArquivo(nome);
 	
 	return 1;
 }
