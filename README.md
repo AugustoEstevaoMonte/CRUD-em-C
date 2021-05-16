@@ -30,8 +30,8 @@
 - [x] C <br>
 
 ## Construção do Projeto:
-- [x] Headers (garantir modularização do programa)<br>
-- [x] CRUD (ORM Hibernate - Ambiente de teste)<br>
+- [x] Headers (garantir modularização do projeto)<br>
+- [x] CRUD <br>
 
 
 
