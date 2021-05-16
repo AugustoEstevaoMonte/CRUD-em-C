@@ -1,2 +1,2 @@
 language = "c"
-run = "gcc main.c -o  main && ./main"
+run = "clang-7 -pthread -lm -o main main.c && ./main"
