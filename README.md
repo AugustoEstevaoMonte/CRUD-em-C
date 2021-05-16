@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img alt="Ecommerce" src="https://github.com/JeffersonLuizCruz/crudperson/blob/main/src/main/resources/templates/crud.png" />
+    <img alt="Ecommerce" src="https://github.com/AugustoEstevaoMonte/Teste/blob/main/images/src/external-content.duckduckgo.com.png" />
 </h1>
 
 <h3 align="center">
