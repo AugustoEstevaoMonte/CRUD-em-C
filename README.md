@@ -22,6 +22,7 @@
 
 
 ## :page_with_curl: Diagrama de Classe <a name="-diagrama"/></a>
+<img alt="Diagrama de Classe" src="https://github.com/AugustoEstevaoMonte/Teste/blob/main/images/src/Copy%20of%20Untitled%20Diagram.png" />
 <h1 align="center">
    
 </h1>
