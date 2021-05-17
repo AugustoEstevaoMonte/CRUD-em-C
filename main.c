@@ -24,6 +24,8 @@ FILE *abreArquivo(char nomeArquivo[]);
 int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
 int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
 void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing);
+void cancelaIngressoArqCarrinho(FILE *arq, int reg);
+
 
 
 //MAIN***********************************************************************************************
@@ -238,7 +240,27 @@ int main (void){
 										break;	
 									case 3:
 										printf("\n\n\n*** EXCLUIR INTEM ***\n\n\n");
-										allPause();
+                    listagemIngressos(arqIngressos);
+                    printf("Digite aqui o codigo do ingresso que deseja EXCLUIR...\n");
+                    ingressos.codigo = leValidaCodigo();
+                    posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
+                    if(posX > 0)
+                    {
+                       ingressos = lerIngressos(posX, arqIngressos);
+                       printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
+                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos);
+                       printf("Tem certeza que deseja excluir? (S ou n)\n");
+                       userKey = getchar();
+                       userKey = toupper(userKey);
+                       if(userKey=='S')
+                       {
+                         cancelaIngressoArqCarrinho(arqCarrinho,posX);
+                       } else{
+                         printf("Operacao abortada pelo usuario...\n");
+                       }
+                    }else{
+                      printf(ERRO);
+                    }
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
@@ -588,6 +610,17 @@ void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing)
 {
   fseek(arq,0,SEEK_END);
   fwrite(&ing, sizeof(ing), 1, arq);
+}
+
+void cancelaIngressoArqCarrinho(FILE *arq, int reg)
+{
+	struct tIngressos ing;
+	fseek(arq, (reg-1)*sizeof(ing), SEEK_SET);
+  fread(&ing,sizeof(ing),1,arq);
+	ing.cancelado = 'c';
+  fseek(arq,-sizeof(ing), SEEK_CUR);
+	fwrite(&ing, sizeof(ing), 1, arq);
+
 }
 
 
