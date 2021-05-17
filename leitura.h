@@ -5,6 +5,7 @@ struct tUsuario lerUser(int reg, FILE *arq);
 void leituraUsuario(FILE *arq);
 void lerCarteiraUser(FILE *arq, struct tUsuario *usr);
 void leituraIngresso(FILE *arq, int busca);
+struct tIngressos lerIngressos(int reg, FILE *arq);
 
 
 
@@ -43,6 +44,14 @@ void leituraIngresso(FILE *arq, int busca)
 	}
   //leitura de arquivo - abre o arquivo, passa pelas informações que estão nele, imprime o que voce quer imprimir de acordo com os comandos
 	
+}
+
+struct tIngressos lerIngressos(int reg, FILE *arq)
+{
+  struct tIngressos ing;
+  fseek(arq,(reg-1)*sizeof(struct tIngressos),SEEK_SET);
+  fread(&ing,sizeof(ing),1,arq);
+  return ing;
 }
 
 #endif

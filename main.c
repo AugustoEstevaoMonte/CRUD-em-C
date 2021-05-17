@@ -22,12 +22,14 @@ int consultaAdmin(FILE *arq, char buscaAdmin[]);
 void cancelaAdmin(FILE *arq, int reg);
 FILE *abreArquivo(char nomeArquivo[]);
 int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
+int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
+void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing);
 
 
 //MAIN***********************************************************************************************
 int main (void){
   printf("Inicio do programa");
-  FILE *arqCadastro,*arqAdministrador, *arqIngressos, *arqCartaoUsuario; //Modificado hoje no dia 08/05/2021 
+  FILE *arqCadastro,*arqAdministrador, *arqIngressos, *arqCartaoUsuario, *arqCarrinho; //Modificado hoje no dia 08/05/2021 
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
@@ -39,6 +41,7 @@ int main (void){
 	arqCadastro = abreArquivo("cadastro.csv"); 
   arqIngressos = abreArquivo("ingressos.csv");
   arqCartaoUsuario = abreArquivo("infoCartao.csv");
+  arqCarrinho = abreArquivo("carrinhoUser.csv");
 
 
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
@@ -213,11 +216,25 @@ int main (void){
 								switch(opcaoSSMenuCarrinho){
 									case 1:
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
-										allPause();
+                    listagemIngressos(arqCarrinho);
 										break;
 									case 2:
-										printf("\n\n\n*** ADICIONAR INTEM ***\n\n\n");
-										allPause();
+										printf("\n\n\n*** ADICIONAR ITEM ***\n\n\n");
+                    listagemIngressos(arqIngressos);
+                    printf("Digite aqui o codigo do ingresso que deseja adicionar...\n");
+                    ingressos.codigo=leValidaCodigo();
+                    posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
+                    if(posX > 0)
+                    {
+                       ingressos = lerIngressos(posX, arqIngressos);
+                       printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
+                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos);
+                       printf("Gravado com sucesso!!!\n");
+                    }else{
+                      printf("Codigo nao encontrado, tente novamente....\n");
+                    }
+                    
+
 										break;	
 									case 3:
 										printf("\n\n\n*** EXCLUIR INTEM ***\n\n\n");
@@ -436,6 +453,7 @@ int main (void){
 	fclose(arqCadastro); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
 	fclose(arqAdministrador);
   fclose(arqCartaoUsuario);
+  fclose(arqCarrinho);
 	return 0;
 }
 
@@ -550,6 +568,27 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra vo
 	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
 }
 
+
+int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod)
+{
+  fseek(arq,0,SEEK_SET);
+  int reg = 0;
+  while(fread(&(*ing),sizeof(*ing),1,arq)!=0)
+  {
+    reg++;
+    if(cod==(*ing).codigo)
+    {
+      return reg; //Encontrou o codigo do show
+    }
+  }
+  return -1; //Não encontrou
+}
+
+void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing)
+{
+  fseek(arq,0,SEEK_END);
+  fwrite(&ing, sizeof(ing), 1, arq);
+}
 
 
 

@@ -15,6 +15,7 @@ void allPause()
 {
   char allP;
   printf("Pressione qualquer tecla para continuar...\n");
+  fflush(stdin);
   allP = getchar();
   system("cls||clear");
 } 
