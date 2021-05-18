@@ -9,7 +9,6 @@ void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int r
 void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg) 
 {
    if(reg == -1){
-    usr.card.cartaoCancelado=' ';
 		fseek(arq, 0, SEEK_END);
 		fwrite(&usr, sizeof(usr), 1, arq);
 	}else{

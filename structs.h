@@ -33,7 +33,6 @@ struct tUsuario
   char usrName[MAX];
   char usrPassword[MAX];
   char usrNickName[MAX];
-  struct tCartaoUsr card;
   float valorCarteira;
 };
 
