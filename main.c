@@ -25,6 +25,7 @@ int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
 int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
 void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
+void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
 
 
 
@@ -255,6 +256,7 @@ int main (void){
                        if(userKey=='S') //Se o userKey pegar lixo de memória ele não grava no arquivo o ingresso excluido.
                        {
                          cancelaIngressoArqCarrinho(arqCarrinho,posX);
+                         excluirFisicamenteCarrrinho (&arqCarrinho,"carrinhoUser.csv");
                        } else{
                          printf("Operacao abortada pelo usuario...\n");
                        }
@@ -610,7 +612,7 @@ void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg)
 {
   if(reg <=0)
   {
-    ing.cancelado = ' ';
+    ing.cancelado = ' '; //Se não for feito isso, ele não cancela o negócio
     fseek(arq,0,SEEK_END);
   }
   fseek(arq,(reg-1)*sizeof(ing),SEEK_SET);
@@ -626,6 +628,29 @@ void cancelaIngressoArqCarrinho(FILE *arq, int reg)
   fseek(arq,-sizeof(ing), SEEK_CUR);
 	fwrite(&ing, sizeof(ing), 1, arq);
 
+}
+
+void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int pra void
+	FILE *arqAux = fopen("carrinhoUser.aux", "a+b");
+	struct tIngressos ing;
+	
+	if(arqAux == NULL){
+		printf("Erro de abertura!!!");
+		return;
+	}
+	
+	fseek(*arqCarrinho, 0, SEEK_SET);
+	while(fread(&ing, sizeof(ing), 1, *arqCarrinho))
+		if(ing.cancelado != 'c')
+    {
+      fwrite(&ing, sizeof(ing), 1, arqAux);
+    }
+	
+	fclose(*arqCarrinho);
+	fclose(arqAux);
+	remove(nome);
+	rename("carrinhoUser.aux", nome); //
+  *arqCarrinho = abreArquivo(nome);
 }
 
 
