@@ -252,7 +252,7 @@ int main (void){
                        printf("Tem certeza que deseja excluir? (S ou n)\n");
                        userKey = getchar();
                        userKey = toupper(userKey);
-                       if(userKey=='S')
+                       if(userKey=='S') //Se o userKey pegar lixo de memória ele não grava no arquivo o ingresso excluido.
                        {
                          cancelaIngressoArqCarrinho(arqCarrinho,posX);
                        } else{
