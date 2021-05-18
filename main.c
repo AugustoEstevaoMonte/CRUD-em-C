@@ -13,7 +13,7 @@
 
 
 void cancelaCartaoUsr(FILE *arq, int reg);
-void excluirFisicamenteCartao (FILE **arqUser, char nome[]); // 2 asteriscos em arq
+void excluirFisicamenteCartao (FILE **arqCard, char nome[]); // 2 asteriscos em arq
 void excluiIngresso(FILE *arq, int reg);
 void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
 int consultaNumeroCartao(FILE *arq, char busca[]);
@@ -26,7 +26,7 @@ int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
 void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
-void gravaDadosArqCartao(FILE *arq, struct tCartaoUsr card, int reg);
+void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
 
 
 
@@ -37,7 +37,6 @@ int main (void){
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
-  struct tCartaoUsr card;
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
   float saldoCarteira=0;
@@ -96,8 +95,8 @@ int main (void){
                     {    printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
                           printf("Digite aqui o numero do cartao: \n");
                           fflush(stdin);
-                          fgets(card.usrNumCartao,MAX,stdin);
-                          erroFunc = leValidaNumeroCartao(card.usrNumCartao);
+                          fgets(usr.card.usrNumCartao,MAX,stdin);
+                          erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                           if(erroFunc==1)
                           {
                             printf("O cartao precisa ter no minimo 8 numeros...\n");
@@ -106,14 +105,14 @@ int main (void){
 
                     }while(erroFunc==1);
 
-                    posX = consultaNumeroCartao(arqCartaoUsuario,card.usrNumCartao);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX==-1)
                     {
                         do
                       {
                         printf("Digite aqui o CV do cartao: \n");
-                        scanf("%d",&card.cvCard);
-                        erroFunc = leValidaCVcard(card.cvCard);
+                        scanf("%d",&usr.card.cvCard);
+                        erroFunc = leValidaCVcard(usr.card.cvCard);
                         if(erroFunc==1)
                         {
                              printf("O CV precisa ter 3 digitos...\n");
@@ -122,10 +121,10 @@ int main (void){
 										  }while(erroFunc==1);
 
 
-                        gravaDadosArqCartao(arqCartaoUsuario,card,posX);
+                        gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
                         printf("CADASTRADO COM SUCESSO!!\n");
-                        printf("Numero cartao: %s\n",card.usrNumCartao);
-                        printf("CV cartao: %d\n",card.cvCard);
+                        printf("Numero cartao: %s\n",usr.card.usrNumCartao);
+                        printf("CV cartao: %d\n",usr.card.cvCard);
                     }else{
                       printf("Numero de cartao ja inserido anteriormente...\n");
                       allPause();
@@ -141,8 +140,8 @@ int main (void){
                     {
                       printf("Digite aqui o numero do cartao que deseja remover: \n");
                       fflush(stdin);
-                      fgets(card.usrNumCartao,MAX,stdin);
-                      erroFunc = leValidaNumeroCartao(card.usrNumCartao);
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                       if(erroFunc==1)
                       {
                         printf("Numero de cartao invalido, tente novamente...\n");
@@ -150,21 +149,20 @@ int main (void){
                       
                     }while(erroFunc==1);
 
-                    posX = consultaNumeroCartao(arqCartaoUsuario,card.usrNumCartao);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
                     {
                         usr = lerUser(posX, arqCartaoUsuario);
-                        printf("Numero do cartao: %s\n",card.usrNumCartao); 
+                        printf("Numero do cartao: %s\n",usr.card.usrNumCartao); 
                         printf("Deseja remover o cartao? (S ou n) \n");
-                        userKey = getchar();
+                        fflush(stdin); 
+                        scanf("%c",&userKey);
                         userKey = toupper(userKey);
                         if(userKey=='S')
                         {
                           cancelaCartaoUsr(arqCartaoUsuario,posX);
                           excluirFisicamenteCartao (&arqCartaoUsuario,"infoCartao.csv");
                           printf("Cartao cancelado com sucesso!!!\n");
-                        }else{
-                          printf(ERRO);
                         }
                     } else {
                       printf("Numero de cartao invalido, tente novamente...\n");
@@ -177,15 +175,15 @@ int main (void){
                     {
                       printf("Confirme o numero do cartao: \n");
                       fflush(stdin);
-                      fgets(card.usrNumCartao,MAX,stdin);
-                      erroFunc = leValidaNumeroCartao(card.usrNumCartao);
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                       if(erroFunc==1)
                       {
                         printf("Numero de cartao invalido, tente novamente...\n");
                       }
                       
                     }while(erroFunc==1);
-                    posX = consultaNumeroCartao(arqCartaoUsuario,card.usrNumCartao);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
                     {
                       lerCarteiraUser(arqCartaoUsuario,&usr);
@@ -194,14 +192,13 @@ int main (void){
                       scanf("%f",&saldoCarteira);
                       usr.valorCarteira+=saldoCarteira;
                       printf("VALOR ADICIONADO COM SUCESSO!!\n");
-                      gravaDadosArqCartao(arqCartaoUsuario,card,posX);
+                      gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
                     } else{
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                     }
 										break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
-							allPause();
 							break;
 						case 3:
 							do{
@@ -496,13 +493,13 @@ FILE *abreArquivo(char nomeArquivo[])
 
 int consultaNumeroCartao(FILE *arq, char busca[])
 {
-  struct tCartaoUsr card;
+  struct tUsuario usr;
   int reg = 0;
 	fseek(arq, 0, SEEK_SET);
-	while(fread(&card, sizeof(card), 1, arq) != 0)
+	while(fread(&usr, sizeof(usr), 1, arq) != 0)
   {
     reg++;
-		if(strcmp(busca,card.usrNumCartao)==0 && (card.cartaoCancelado!='c'))
+		if(strcmp(busca,usr.card.usrNumCartao)==0 && (usr.card.cartaoCancelado!='c'))
     {
       return reg; // 0 representa que achou o numero do cartao
     }
@@ -514,18 +511,18 @@ int consultaNumeroCartao(FILE *arq, char busca[])
 
 void cancelaCartaoUsr(FILE *arq, int reg)
 {
-	struct tCartaoUsr card;
-	fseek(arq, (reg-1)*sizeof(card), SEEK_SET);
-  fread(&card,sizeof(card),1,arq);
-	card.cartaoCancelado = 'c';
-  fseek(arq,-sizeof(card), SEEK_CUR);
-	fwrite(&card, sizeof(card), 1, arq);
+	struct tUsuario usr;
+	fseek(arq, (reg-1)*sizeof(usr), SEEK_SET);
+  fread(&usr,sizeof(usr),1,arq);
+	usr.card.cartaoCancelado = 'c';
+  fseek(arq,-sizeof(usr), SEEK_CUR);
+	fwrite(&usr, sizeof(usr), 1, arq);
 
 }
 
 void excluirFisicamenteCartao (FILE **arqCard, char nome[]){//mudar int pra void
 	FILE *arqAux = fopen("infoCartao.aux", "a+b");
-	struct tCartaoUsr card;
+	struct tUsuario usr;
 	
 	if(arqAux == NULL){
 		printf("Erro de abertura!!!");
@@ -533,10 +530,10 @@ void excluirFisicamenteCartao (FILE **arqCard, char nome[]){//mudar int pra void
 	}
 	
 	fseek(*arqCard, 0, SEEK_SET);
-	while(fread(&card, sizeof(card), 1, *arqCard))
-		if(card.cartaoCancelado != 'c')
+	while(fread(&usr, sizeof(usr), 1, *arqCard))
+		if(usr.card.cartaoCancelado != 'c')
     {
-      fwrite(&card, sizeof(card), 1, arqAux);
+      fwrite(&usr, sizeof(usr), 1, arqAux);
     }
 	
 	fclose(*arqCard);
@@ -649,20 +646,18 @@ void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int p
   *arqCarrinho = abreArquivo(nome);
 }
 
-void gravaDadosArqCartao(FILE *arq, struct tCartaoUsr card, int reg)
+
+
+void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
 {
     if(reg <=0)
     {
-      card.cartaoCancelado = ' '; //Se não for feito isso, ele não cancela o negócio
+      usr.card.cartaoCancelado = ' '; //Se não for feito isso, ele não cancela o negócio
       fseek(arq,0,SEEK_END);
     }
-    fseek(arq,(reg-1)*sizeof(card),SEEK_SET);
-    fwrite(&card, sizeof(card), 1, arq);
+    fseek(arq,(reg-1)*sizeof(usr),SEEK_SET);
+    fwrite(&usr, sizeof(usr), 1, arq);
 }
-
-
-
-
 
 
 
