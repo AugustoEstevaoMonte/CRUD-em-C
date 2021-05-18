@@ -23,7 +23,7 @@ void cancelaAdmin(FILE *arq, int reg);
 FILE *abreArquivo(char nomeArquivo[]);
 int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
 int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
-void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing);
+void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 
 
@@ -230,7 +230,7 @@ int main (void){
                     {
                        ingressos = lerIngressos(posX, arqIngressos);
                        printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
-                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos);
+                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
                        printf("Gravado com sucesso!!!\n");
                     }else{
                       printf("Codigo nao encontrado, tente novamente....\n");
@@ -248,7 +248,7 @@ int main (void){
                     {
                        ingressos = lerIngressos(posX, arqIngressos);
                        printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
-                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos);
+                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
                        printf("Tem certeza que deseja excluir? (S ou n)\n");
                        userKey = getchar();
                        userKey = toupper(userKey);
@@ -606,9 +606,14 @@ int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod)
   return -1; //Não encontrou
 }
 
-void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing)
+void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg)
 {
-  fseek(arq,0,SEEK_END);
+  if(reg <=0)
+  {
+    ing.cancelado = ' ';
+    fseek(arq,0,SEEK_END);
+  }
+  fseek(arq,(reg-1)*sizeof(ing),SEEK_SET);
   fwrite(&ing, sizeof(ing), 1, arq);
 }
 
