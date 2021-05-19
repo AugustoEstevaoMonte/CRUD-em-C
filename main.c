@@ -260,7 +260,7 @@ int main (void){
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-										posX = exportaCadastroXML(arqCadastro);
+										posX = exportaCadastroXML(arqCadastro); //teste deve ser retirado depois
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
