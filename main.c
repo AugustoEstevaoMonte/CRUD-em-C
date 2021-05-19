@@ -27,6 +27,7 @@ void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
 void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
+int exportaCadastroXML(FILE *arqA);
 
 
 
@@ -259,7 +260,7 @@ int main (void){
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-										allPause();
+										posX = exportaCadastroXML(arqCadastro);
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
@@ -657,6 +658,29 @@ void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
     }
     fseek(arq,(reg-1)*sizeof(usr),SEEK_SET);
     fwrite(&usr, sizeof(usr), 1, arq);
+}
+
+int exportaCadastroXML(FILE *arqA)
+{
+  char ch;
+  FILE *arq = fopen("dados.xml","w+b");
+  if(arq==NULL)
+  {
+    return 0;
+  }
+
+  fseek(arqA,0,SEEK_SET);
+  while(!feof(arqA))
+  {
+    ch = fgetc(arqA);
+    if(ch !=EOF)
+    {
+       fputc(ch, arq);
+    }
+  }
+
+  fclose(arq);
+  return 0;
 }
 
 
