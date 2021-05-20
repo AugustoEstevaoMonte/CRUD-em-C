@@ -260,7 +260,7 @@ int main (void){
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-										posX = exportaCadastroXML(arqCadastro); //teste deve ser retirado depois
+										posX = exportaCadastroXML(arqCartaoUsuario); //teste deve ser retirado depois
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
@@ -664,7 +664,7 @@ int exportaCadastroXML(FILE *arqA)
 {
   char ch;
   FILE *arq = fopen("dados.xml","w+b");
-  if(arq==NULL)
+  if(arq==NULL || arqA == NULL)
   {
     return 0;
   }
