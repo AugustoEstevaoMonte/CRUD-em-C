@@ -27,7 +27,7 @@ void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
 void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
-int exportaCadastroXML(FILE *arqA);
+int exportaCartaoXML(FILE *arqA);
 
 
 
@@ -197,6 +197,7 @@ int main (void){
                     } else{
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                     }
+                    posX = exportaCartaoXML(arqCartaoUsuario); 
 										break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
@@ -234,7 +235,7 @@ int main (void){
 
 										break;	
 									case 3:
-										printf("\n\n\n*** EXCLUIR INTEM ***\n\n\n");
+										printf("\n\n\n*** EXCLUIR ITEM ***\n\n\n");
                     listagemIngressos(arqIngressos);
                     printf("Digite aqui o codigo do ingresso que deseja EXCLUIR...\n");
                     ingressos.codigo = leValidaCodigo();
@@ -260,7 +261,6 @@ int main (void){
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-										posX = exportaCadastroXML(arqCartaoUsuario); //teste deve ser retirado depois
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
@@ -421,7 +421,7 @@ int main (void){
 										allPause();
 										break;
 									case 4:
-                  //DEU ERRO NÃO ROLOU
+                  
 										/*printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
                     printf("Digite aqui o nome do administrador(a)...\n");
                     do
@@ -660,7 +660,7 @@ void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
     fwrite(&usr, sizeof(usr), 1, arq);
 }
 
-int exportaCadastroXML(FILE *arqA)
+int exportaCartaoXML(FILE *arqA)
 {
   char ch;
   FILE *arq = fopen("dados.xml","w+b");
