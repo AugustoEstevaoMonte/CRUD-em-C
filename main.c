@@ -38,6 +38,7 @@ int main (void){
   struct tUsuario usr;
 	struct tAdministrador admin;
   struct tIngressos ingressos;
+  struct tNo *new, *administradores=NULL; //Struct tNo ligada a Administrador
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
   int buscaIngresso;

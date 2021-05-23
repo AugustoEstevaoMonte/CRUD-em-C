@@ -37,4 +37,10 @@ struct tUsuario
   float valorCarteira;
 };
 
+struct tNo
+{
+  struct tAdministrador dado;
+  struct tNo *next;
+};
+
 #endif
