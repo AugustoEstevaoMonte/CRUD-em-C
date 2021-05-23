@@ -28,7 +28,9 @@ void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
 void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
 int exportaCartaoXML(FILE *arqA);
+void listArqCar(FILE *arq);
 int listarArquivoCarrinho(FILE *arq);
+void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira);
 
 
 
@@ -191,7 +193,6 @@ int main (void){
                     if(posX > 0)
                     {
                       lerCarteiraUser(arqCartaoUsuario,&usr);
-                      //printf("Seu saldo atual na conta: %0.2f\n",usr.valorCarteira);
                       printf("Digite um valor que deseja adicionar: \n");
                       scanf("%f",&saldoCarteira);
                       usr.valorCarteira+=saldoCarteira;
@@ -217,7 +218,7 @@ int main (void){
 								switch(opcaoSSMenuCarrinho){
 									case 1:
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
-                    listagemIngressos(arqCarrinho);
+                    listArqCar(arqCarrinho);
 										break;
 									case 2:
 										printf("\n\n\n*** ADICIONAR ITEM ***\n\n\n");
@@ -239,7 +240,7 @@ int main (void){
 										break;	
 									case 3:
 										printf("\n\n\n*** EXCLUIR ITEM ***\n\n\n");
-                    listagemIngressos(arqIngressos);
+                    listArqCar(arqCarrinho);
                     printf("Digite aqui o codigo do ingresso que deseja EXCLUIR...\n");
                     ingressos.codigo = leValidaCodigo();
                     posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
@@ -250,11 +251,13 @@ int main (void){
                        gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
                        printf("Tem certeza que deseja excluir? (S ou n)\n");
                        userKey = getchar();
+                       userKey = 's';
                        userKey = toupper(userKey);
                        if(userKey=='S') //Se o userKey pegar lixo de memória ele não grava no arquivo o ingresso excluido.
                        {
                          cancelaIngressoArqCarrinho(arqCarrinho,posX);
                          excluirFisicamenteCarrrinho (&arqCarrinho,"carrinhoUser.csv");
+                         printf("EXCLUIDO COM SUCESSO!!!!\n");
                        } else{
                          printf("Operacao abortada pelo usuario...\n");
                        }
@@ -270,18 +273,22 @@ int main (void){
                       ingressos = lerIngressos(0,arqCarrinho);
                       printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
                       usr = lerUser(0,arqCadastro);
-                      lerCarteiraUser(arqCartaoUsuario,&usr);
+                      lerCarteiraUser(arqCartaoUsuario,&usr); //Exibe o valor da carteira
                       printf("Deseja continuar com a transacao? (S ou n)\n");
                       fflush(stdin);
                       scanf("%c",&userKey);
+                      userKey = 's';
                       userKey = toupper(userKey);
                       if(userKey=='S')
                       {
-
+                          subtraiValores(&usr,totalIngressos,arqCartaoUsuario);
+                          cancelaCartaoUsr(arqCartaoUsuario,0);
+                          excluirFisicamenteCartao (&arqCartaoUsuario,"infoCartao.csv");
+                          gravaDadosArqCartao(arqCartaoUsuario,usr,0);
+                          printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
                       } else{
                         printf("Transacao abortada pelo usuario...\n");
                       }
-                      //Depois de ter o valor total, precisa verificar o valor do saldo na carteira do usr, e subtrair um valor dela que não pode ser negativo
                     }else{
                       printf("Não foi encontrado nenhum dado...\n");
                     }
@@ -763,6 +770,18 @@ void excluirFisicamenteAdmin (FILE **arqAdm, char nome[])
   *arqAdm = abreArquivo(nome);
 }
 
+void listArqCar(FILE *arq)
+{
+    struct tIngressos ingressos;
+    fseek(arq, 0, SEEK_SET);
+    while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
+    {    
+            
+                printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+            
+    }
+}
+
 int listarArquivoCarrinho(FILE *arq)
 {
   float val=0;
@@ -776,4 +795,17 @@ int listarArquivoCarrinho(FILE *arq)
   }
   return val;
 }
+
+void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
+{
+  fseek(arqCarteira, 0, SEEK_SET);
+	  while(fread(&(*usr),sizeof(*usr),1,arqCarteira)!=0)
+    {
+      (*usr).valorCarteira-=valor;
+      printf("O novo valor e de: %0.2f R$\n",(*usr).valorCarteira);
+    }
+
+}
+
+
 

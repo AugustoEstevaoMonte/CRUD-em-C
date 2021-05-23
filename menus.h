@@ -85,7 +85,7 @@ int menuCarrinho(){
 		printf("\n\n\n*** MEU CARRINHO ***\n\n\n");
 		printf(" 1 - Ver meu carrinho\n");
 		printf(" 2 - Adicionar item\n");
-		printf(" 3 - Excluir intem\n");
+		printf(" 3 - Excluir item\n");
 		printf(" 4 - Finalizar compra\n");
 		printf(" 0 - Voltar\n");
 		printf("\nDigite sua opcao: ");
