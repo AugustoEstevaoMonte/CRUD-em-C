@@ -291,10 +291,11 @@ int main (void){
 				arqAdministrador = fopen("admin.csv","r+b");
 				if(arqAdministrador == NULL) //ARQ = NULL QUER DIZER QUE NÃO FOI ENCONTRADO NENHUM ADMIN/ARQUIVO,  Modificado hoje no dia 07/05/2021 
 				{
+          new = malloc(sizeof(struct tNo)); //Alocado a memória pro ponteiro new
 					arqAdministrador = abreArquivo("admin.csv");
 					printf("Nenhum administrador encontrado, faca seu cadastro....\n");
-					leValidaUsrName(admin.adminName);
-					leValidaUsrPassword(admin.adminPassword);
+					leValidaUsrName((*new).dado.adminName);
+					leValidaUsrPassword((*new).dado.adminPassword);
 					gravaDadosArquivoAdministrador(arqAdministrador,admin);
 					printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
 				}
