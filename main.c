@@ -21,7 +21,7 @@ int consultaIngressos(FILE *arq, int busca);
 int consultaAdmin(FILE *arq, char buscaAdmin[]);
 void cancelaAdmin(FILE *arq, int reg);
 FILE *abreArquivo(char nomeArquivo[]);
-int excluirFisicamenteAdmin(FILE *arqAdm, char nomeArq[]);
+void excluirFisicamenteAdmin (FILE **arqAdm, char nome[]);
 int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
 void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
@@ -291,11 +291,10 @@ int main (void){
 				arqAdministrador = fopen("admin.csv","r+b");
 				if(arqAdministrador == NULL) //ARQ = NULL QUER DIZER QUE NÃO FOI ENCONTRADO NENHUM ADMIN/ARQUIVO,  Modificado hoje no dia 07/05/2021 
 				{
-          new = malloc(sizeof(struct tNo)); //Alocado a memória pro ponteiro new
 					arqAdministrador = abreArquivo("admin.csv");
 					printf("Nenhum administrador encontrado, faca seu cadastro....\n");
-					leValidaUsrName((*new).dado.adminName);
-					leValidaUsrPassword((*new).dado.adminPassword);
+					leValidaUsrName(admin.adminName);
+					leValidaUsrPassword(admin.adminPassword);
 					gravaDadosArquivoAdministrador(arqAdministrador,admin);
 					printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
 				}
@@ -427,7 +426,7 @@ int main (void){
 										break;
 									case 4:
                   
-										/*printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
+										printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
                     printf("Digite aqui o nome do administrador(a)...\n");
                     do
                     {
@@ -439,10 +438,10 @@ int main (void){
                       } 
                     }while(strlen(admin.adminName)==1 || strlen(admin.adminName)<=5);
                     posX = consultaAdmin(arqAdministrador,admin.adminName);
-                    if(posX==0)
+                    if(posX > 0)
                     {
                       printf("ADMINISTRADOR ENCONTRADO!!!\n");
-                      lerAdministrador(arqAdministrador,&admin,admin.adminName);
+                      admin =  lerAdministrador(posX,arqAdministrador);
                       printf("Deseja remover o administrador(a) ? (S ou n) \n");
                       fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
                       scanf("%c",&userKey);
@@ -450,10 +449,8 @@ int main (void){
                       if(userKey=='S')
                       {
                           cancelaAdmin(arqAdministrador,posX);
-                          gravaDadosArquivoAdministrador(arqAdministrador,admin);
-                          excluirFisicamenteAdmin(arqAdministrador,"admin.csv");
+                          excluirFisicamenteAdmin(&arqAdministrador,"admin.csv");
                           printf("ADMINISTRADOR REMOVIDO COM SUCESSO!!!\n");
-                          allPause();
                       }else{
                         printf(ERRO);
                       }
@@ -461,7 +458,6 @@ int main (void){
                     }else{
                       printf(ERRO);
                     }
-										allPause();*/
 										break;
 									
 								}
@@ -692,3 +688,55 @@ int exportaCartaoXML(FILE *arqA)
 
 
 
+
+int consultaAdmin(FILE *arq, char busca[])
+{
+  struct tAdministrador adm;
+  int reg = 0;
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&adm, sizeof(adm), 1, arq) != 0)
+  {
+    reg++;
+		if(strcmp(busca,adm.adminName)==0 && (adm.cancelado!='c'))
+    {
+      return reg; // 0 representa que achou o numero do cartao
+    }
+	}
+	return -1; // -1 representa não encontrado
+}
+
+void cancelaAdmin(FILE *arq, int reg)
+{
+	struct tAdministrador adm;
+	fseek(arq, (reg-1)*sizeof(adm), SEEK_SET);
+  fread(&adm,sizeof(adm),1,arq);
+	adm.cancelado = 'c';
+  fseek(arq,-sizeof(adm), SEEK_CUR);
+	fwrite(&adm, sizeof(adm), 1, arq);
+
+}
+
+
+void excluirFisicamenteAdmin (FILE **arqAdm, char nome[])
+{
+	FILE *arqAux = fopen("admin.aux", "a+b");
+	struct tAdministrador adm;
+	
+	if(arqAux == NULL){
+		printf("Erro de abertura!!!");
+		return;
+	}
+	
+	fseek(*arqAdm, 0, SEEK_SET);
+	while(fread(&adm, sizeof(adm), 1, *arqAdm))
+		if(adm.cancelado != 'c')
+    {
+      fwrite(&adm, sizeof(adm), 1, arqAux);
+    }
+	
+	fclose(*arqAdm);
+	fclose(arqAux);
+	remove(nome);
+	rename("admin.aux", nome); //
+  *arqAdm = abreArquivo(nome);
+}

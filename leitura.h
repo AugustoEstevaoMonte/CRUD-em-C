@@ -1,11 +1,13 @@
 #ifndef LEITURA_H
 #define LEITURA_H
+#include "structs.h"
 
 struct tUsuario lerUser(int reg, FILE *arq);
 void leituraUsuario(FILE *arq);
 void lerCarteiraUser(FILE *arq, struct tUsuario *usr);
 void leituraIngresso(FILE *arq, int busca);
 struct tIngressos lerIngressos(int reg, FILE *arq);
+struct tAdministrador lerAdministrador(int reg, FILE *arq);
 
 
 
@@ -53,6 +55,14 @@ struct tIngressos lerIngressos(int reg, FILE *arq)
   fseek(arq,(reg-1)*sizeof(struct tIngressos),SEEK_SET);
   fread(&ing,sizeof(ing),1,arq);
   return ing;
+}
+
+struct tAdministrador lerAdministrador(int reg, FILE *arq)
+{
+  struct tAdministrador adm;
+  fseek(arq,(reg-1)*sizeof(struct tAdministrador),SEEK_SET);
+  fread(&adm,sizeof(adm),1,arq);
+  return adm;
 }
 
 #endif
