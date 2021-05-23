@@ -39,6 +39,7 @@ void leituraIngresso(FILE *arq, int busca)
 	fseek(arq, 0, SEEK_SET);
   while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0){
 		if(ingressos.codigo == busca){
+     printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
       return;
     }
 	}

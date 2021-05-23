@@ -32,13 +32,13 @@ void gravaDadosArquivoIngressos(FILE *arq, struct tIngressos ingressos)
 
 void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int reg)
 {
-   if(reg == -1){
+  /* if(reg == -1){
 		fseek(arq, 0, SEEK_END);
 		fwrite(&ingressos, sizeof(ingressos), 1, arq);
-	}else{
+	}else{*/
 		fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
 		fwrite(&ingressos, sizeof(ingressos), 1, arq);
-	}
+//	}
 }
 
 #endif

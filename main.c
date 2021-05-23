@@ -40,6 +40,7 @@ int main (void){
   struct tIngressos ingressos;
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
+  int buscaIngresso;
   float saldoCarteira=0;
 
 
@@ -357,35 +358,37 @@ int main (void){
 							printf("\n\n\n*** EXCLUIR INGRESSOS ***\n\n\n");
 
               printf("Digite aqui o codigo do ingresso que deseja excluir: \n");
-              fscanf(stdin, "%d", &ingressos.codigo);
+              //fscanf(stdin, "%d", &ingressos.codigo);
+              scanf("%d", &buscaIngresso);
 
-              posY = consultaIngressos(arqIngressos,ingressos.codigo);
+              //aaaaa
+
+              posY = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
 
 
-              if(posY == 0)
+              if(posY > 0)
                     {
-                        leituraIngresso(arqIngressos, ingressos.codigo);
-                        //void leituraUsuario(FILE *arq);
-                        printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-                        printf("Deseja excluir o ingresso? (S ou n) \n");
-                        fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
-                        scanf("%c",&userKey2);
-                        userKey2 = toupper(userKey2);
-                        if(userKey2=='S')
-                        {
-                          //cancelaCartaoUsr(arqCadastro,posX);
-                          excluiIngresso(arqIngressos,posY);
-                          //gravaDadosNoArquivoUsuario(arqCadastro,usr,posX);
-                          gravaDadosEspecificoIngressos(arqIngressos, ingressos, posY);
-                          //excluirFisicamenteCartao (arqCadastro,"cadastro.csv");
-                          excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
-                          //printf("Cartao cancelado com sucesso!!!\n");
-                          printf("Ingresso excluído!!!\n");
-                          allPause();
+                       // leituraIngresso(arqIngressos, buscaIngresso);
+                       	fseek(arqIngressos, 0, SEEK_SET);
+                        while(fread(&ingressos, sizeof(ingressos), 1, arqIngressos) != 0){
+                          if(ingressos.codigo == buscaIngresso){
+                          printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+                          printf("Deseja excluir o ingresso? (S ou N) \n");
+                          scanf(" %c", &userKey2);
+                          userKey2 = toupper(userKey2);
+                            if(userKey2=='S')
+                            {
+                              excluiIngresso(arqIngressos,posY);
+                              gravaDadosEspecificoIngressos(arqIngressos, ingressos, posY);
+                              excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
+                              printf("Ingresso excluído!!!\n");
+                            }
+                          }
                         }
+                        
                     } else {
                       printf("Codigo invalido, tente novamente...\n");
-                      allPause();
+                      //allPause();
                     }
 
 
@@ -544,20 +547,7 @@ void excluirFisicamenteCartao (FILE **arqCard, char nome[]){//mudar int pra void
   *arqCard = abreArquivo(nome);
 }
 
-int consultaIngressos(FILE *arq, int busca)
-{
-  struct tIngressos ingressos;
-  int ind = 0;
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
-  {
-		if(ingressos.codigo == busca)
-    {
-      return 0; // 0 representa que achou o numero do cartao
-    }
-	}
-	return -1; // -1 representa não encontrado
-}
+
 
 void excluiIngresso(FILE *arq, int reg)
 {
@@ -586,6 +576,19 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra vo
 	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
 }
 
+int consultaIngressos(FILE *arq, int busca)
+{
+  struct tIngressos ingressos;
+	fseek(arq, 0, SEEK_SET);
+	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
+  {
+		if(ingressos.codigo == busca)
+    {
+      return 0; // 0 representa que achou o ingresso
+    }
+	}
+	return -1; // -1 representa não encontrado
+}
 
 int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod)
 {
