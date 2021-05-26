@@ -31,7 +31,7 @@ int exportaCartaoXML(FILE *arqA);
 void listArqCar(FILE *arq);
 int listarArquivoCarrinho(FILE *arq);
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira);
-
+void gravaIngAlt(FILE *arq, struct tIngressos ing, int reg);
 
 
 //MAIN***********************************************************************************************
@@ -80,6 +80,7 @@ int main (void){
 					// 1 - Ingressos disponiveis
 					// 2 - Forma de pagamento
 					// 3 - Meu carrinho
+          // 4 - Consulta
 					// 0 - Logout
 					switch(opcaoSMenuUser){
 						case 1:
@@ -100,7 +101,7 @@ int main (void){
                     do
                     {    printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
                           printf("Digite aqui o numero do cartao: \n");
-                          fflush(stdin);
+                          setbuf(stdin,NULL);
                           fgets(usr.card.usrNumCartao,MAX,stdin);
                           erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                           if(erroFunc==1)
@@ -145,7 +146,7 @@ int main (void){
                     do
                     {
                       printf("Digite aqui o numero do cartao que deseja remover: \n");
-                      fflush(stdin);
+                      setbuf(stdin,NULL);
                       fgets(usr.card.usrNumCartao,MAX,stdin);
                       erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                       if(erroFunc==1)
@@ -161,7 +162,7 @@ int main (void){
                         usr = lerUser(posX, arqCartaoUsuario);
                         printf("Numero do cartao: %s\n",usr.card.usrNumCartao); 
                         printf("Deseja remover o cartao? (S ou n) \n");
-                        fflush(stdin); 
+                        setbuf(stdin,NULL); 
                         scanf("%c",&userKey);
                         userKey = toupper(userKey);
                         if(userKey=='S')
@@ -180,7 +181,7 @@ int main (void){
                      do
                     {
                       printf("Confirme o numero do cartao: \n");
-                      fflush(stdin);
+                      setbuf(stdin,NULL);
                       fgets(usr.card.usrNumCartao,MAX,stdin);
                       erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                       if(erroFunc==1)
@@ -250,8 +251,8 @@ int main (void){
                        printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
                        gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
                        printf("Tem certeza que deseja excluir? (S ou n)\n");
-                       userKey = getchar();
-                       userKey = 's';
+                       setbuf(stdin,NULL);
+                       scanf("%c",&userKey);
                        userKey = toupper(userKey);
                        if(userKey=='S') //Se o userKey pegar lixo de memória ele não grava no arquivo o ingresso excluido.
                        {
@@ -274,10 +275,9 @@ int main (void){
                       printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
                       usr = lerUser(0,arqCadastro);
                       lerCarteiraUser(arqCartaoUsuario,&usr); //Exibe o valor da carteira
-                      printf("Deseja continuar com a transacao? (S ou n)\n");
-                      fflush(stdin);
+                      printf("Deseja continuar com a transacao? (S ou N)\n");
+                      setbuf(stdin,NULL);
                       scanf("%c",&userKey);
-                      userKey = 's';
                       userKey = toupper(userKey);
                       if(userKey=='S')
                       {
@@ -296,6 +296,20 @@ int main (void){
 								}
 							}while(opcaoSSMenuCarrinho!=0);
 							break;
+              case 4:
+              printf("\n\n*** CONSULTA ***\n\n");
+              printf("Digite aqui o codigo do ingresso: ");
+              scanf("%d", &buscaIngresso);
+              posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
+              if(posX > 0){
+                       leituraIngresso(arqIngressos, buscaIngresso);
+                        
+                    } else {
+                      printf("Codigo invalido, tente novamente...\n");
+                      //allPause();
+                    }
+
+              break;
 					}
 			}while(opcaoSMenuUser!=0);
 				break;
@@ -380,7 +394,55 @@ int main (void){
 							break;
 						case 3:
 							printf("\n\n\n*** ALTERAR INGRESSOS ***\n\n\n");
-              //posY = consultaIngressos(arqIngressos,ingressos.codigo);
+
+              do
+              {
+                
+                printf("Digite aqui o codigo do ingresso: \n");
+                scanf("%i",&buscaIngresso);
+                if(buscaIngresso<0)
+                {
+                  printf(ERRO);
+                } 
+              }while(buscaIngresso<0);
+
+
+              posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
+
+              if(posX>0)
+              {
+                  ingressos = lerIngressos(posX,arqIngressos);
+                  printf("A banda e: %s\n",ingressos.banda);
+                  printf("Digite a nova banda...\n");
+                  setbuf(stdin,NULL);
+                  leValidaNomeBanda(ingressos.banda);
+                  printf("O local e: %s\n",ingressos.local);
+                  printf("Digite o novo local...\n");
+                  setbuf(stdin,NULL);
+                  leValidaLocal(ingressos.local);
+                  printf("A hora inicial e: %i\n",ingressos.horaIni);
+                  printf("Digite a nova hora inicial...\n");
+                  setbuf(stdin,NULL);
+                  ingressos.horaIni = leValidaHorasIni();
+                  printf("Os minuto inicial e: %i\n",ingressos.minIni);
+                  printf("Digite o novo minuto inicial...\n");
+                  ingressos.minIni = leValidaMinIni();
+                  printf("A hora final e: %i\n",ingressos.horaFim);
+                  printf("Digite a hora final...\n");
+                  ingressos.horaFim = leValidaHorasFim();
+                  printf("O minuto final e: %i\n",ingressos.minFim);
+                  printf("Digite o minuto final...\n");
+                  ingressos.minFim = leValidaMinFim();
+                  printf("O valor do ingresso e: %0.2f\n",ingressos.valor);
+                  printf("Digite o novo valor do ingresso...\n");
+                  ingressos.valor = leValidaValor();
+                  gravaIngAlt(arqIngressos,ingressos,posX);
+                  printf("ALTERADO COM SUCESSO!!!!\n");
+              }else{
+                printf(ERRO);
+              }
+
+
               
 							
 							break;
@@ -393,10 +455,9 @@ int main (void){
 
               //aaaaa
 
-              posY = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
+              posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
 
-
-              if(posY > 0)
+              if(posX > 0)
                     {
                        // leituraIngresso(arqIngressos, buscaIngresso);
                        	fseek(arqIngressos, 0, SEEK_SET);
@@ -406,10 +467,34 @@ int main (void){
                           printf("Deseja excluir o ingresso? (S ou N) \n");
                           scanf(" %c", &userKey2);
                           userKey2 = toupper(userKey2);
-                            if(userKey2=='S')
-                            {
-                              excluiIngresso(arqIngressos,posY);
-                              gravaDadosEspecificoIngressos(arqIngressos, ingressos, posY);
+                            if(userKey2=='S'){
+                              excluiIngresso(arqIngressos,posX);
+                              //ESSA FUNÇÃO NÃO PODE ESTAR AQUIgravaDadosEspecificoIngressos(arqIngressos, ingressos, posX);
+                              excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
+                              printf("Ingresso excluído!!!\n");
+                            }
+                          }
+                        }
+                        
+                    } else {
+                      printf("Codigo invalido, tente novamente...\n");
+                      //allPause();
+                    }
+
+
+              if(posX > 0)
+                    {
+                       // leituraIngresso(arqIngressos, buscaIngresso);
+                       	fseek(arqIngressos, 0, SEEK_SET);
+                        while(fread(&ingressos, sizeof(ingressos), 1, arqIngressos) != 0){
+                          if(ingressos.codigo == buscaIngresso){
+                          printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+                          printf("Deseja excluir o ingresso? (S ou N) \n");
+                          scanf(" %c", &userKey2);
+                          userKey2 = toupper(userKey2);
+                            if(userKey2=='S'){
+                              excluiIngresso(arqIngressos,posX);
+                              //ESSA FUNÇÃO NÃO PODE ESTAR AQUIgravaDadosEspecificoIngressos(arqIngressos, ingressos, posX);
                               excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
                               printf("Ingresso excluído!!!\n");
                             }
@@ -472,7 +557,7 @@ int main (void){
                       printf("ADMINISTRADOR ENCONTRADO!!!\n");
                       admin =  lerAdministrador(posX,arqAdministrador);
                       printf("Deseja remover o administrador(a) ? (S ou n) \n");
-                      fflush(stdin); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
+                      setbuf(stdin,NULL); //SE NÃO FOR EXECUTADO GERA ERRO NO CÓDIGO
                       scanf("%c",&userKey);
                       userKey = toupper(userKey);
                       if(userKey=='S')
@@ -492,9 +577,23 @@ int main (void){
 								}
 							}while(opcaoSSMenuGerenciamento!=0);
 							break;
+              case 6:
+              printf("\n\n*** CONSULTA ***\n\n");
+              printf("Digite aqui o codigo do ingresso: ");
+              scanf("%d", &buscaIngresso);
+              posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
+              if(posX > 0){
+                       leituraIngresso(arqIngressos, buscaIngresso);
+                        
+                    } else {
+                      printf("Codigo invalido, tente novamente...\n");
+                      //allPause();
+                    }
+              break;
 					}
 				}while(opcaoSMenuAdm!=0);
 				break;
+
 		}
 	}while(opcaoMenuLogin!=0);
 
@@ -809,3 +908,14 @@ void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
 
 
 
+void gravaIngAlt(FILE *arq, struct tIngressos ing, int reg)
+{
+  
+	if(reg<=0)
+  {
+    fseek(arq,0,SEEK_END);
+  }else{
+    fseek(arq,(reg-1) * sizeof(struct tIngressos),SEEK_SET);
+    fwrite(&ing,sizeof(ing),1,arq);
+  }
+}

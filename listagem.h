@@ -14,7 +14,7 @@ void listagemIngressos(FILE *arq)
   while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
   {       if(ingressos.cancelado!='c')
           {
-               printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+               printf("\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
           }
   }
 }

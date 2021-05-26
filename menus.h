@@ -15,7 +15,7 @@ void allPause()
 {
   char allP;
   printf("Pressione qualquer tecla para continuar...\n");
-  fflush(stdin);
+  setbuf(stdin,NULL);
   allP = getchar();
   system("cls||clear");
 } 
@@ -48,14 +48,15 @@ int menuUser(){
 		printf(" 1 - Ingressos disponiveis\n");
 		printf(" 2 - Formas de pagamento\n");
 		printf(" 3 - Meu carrinho\n");
+    printf(" 4 - Consultar\n");
 		printf(" 0 - Logout\n");
 		printf("\nDigite sua opcao: ");
 		scanf("%d", &op);
-		if(op<0 || op>3){
+		if(op<0 || op>4){
 			printf(ERRO);
 			allPause();
 		}
-	}while(op<0 || op>3);
+	}while(op<0 || op>4);
 	return op;
 }
 
@@ -107,14 +108,15 @@ int menuAdm(){
 		printf(" 3 - Alterar ingresso\n");
 		printf(" 4 - Excluir ingresso\n");
 		printf(" 5 - Gerenciar contas\n");
+    printf(" 6 - Consulta\n");
 		printf(" 0 - Logout\n");
 		printf("\nDigite sua opcao: ");
 		scanf("%d", &op);
-		if(op<0 || op>5){
+		if(op<0 || op>6){
 			printf(ERRO);
 			allPause();
 		}
-	}while(op<0 || op>5);
+	}while(op<0 || op>6);
 	return op;
 }
 
