@@ -465,10 +465,7 @@ int main (void){
                     if(posX > 0)
                     {   
                         setbuf(stdin,NULL);
-                        //usr = lerUser(posX, arqCartaoUsuario);
-                          fseek(arqIngressos,(posX-1)*sizeof(struct tIngressos),SEEK_SET);
-                          //fread(&ingressos,sizeof(ingressos),1,arqIngressos);
-
+                        ingressos=lerIngressos(posX, arqIngressos);
                         printf("Numero do codigo: %d\n",ingressos.codigo);printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
                         printf("Deseja remover o ingresso? (S ou N) \n");
                         setbuf(stdin,NULL); 
@@ -484,65 +481,7 @@ int main (void){
                       printf("Ingresso indisponivel\n");
                     }
                       
-/*
-              printf("Digite aqui o codigo do ingresso que deseja excluir: \n");
-              //fscanf(stdin, "%d", &ingressos.codigo);
-              scanf("%d", &buscaIngresso);
 
-              //aaaaa
-
-              posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
-
-              if(posX > 0)
-                    {
-                       // leituraIngresso(arqIngressos, buscaIngresso);
-                       	fseek(arqIngressos, 0, SEEK_SET);
-                        while(fread(&ingressos, sizeof(ingressos), 1, arqIngressos) != 0){
-                          if(ingressos.codigo == buscaIngresso){
-                          printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-                          printf("Deseja excluir o ingresso? (S ou N) \n");
-                          scanf(" %c", &userKey2);
-                          userKey2 = toupper(userKey2);
-                            if(userKey2=='S'){
-                              excluiIngresso(arqIngressos,posX);
-                              //ESSA FUNÇÃO NÃO PODE ESTAR AQUIgravaDadosEspecificoIngressos(arqIngressos, ingressos, posX);
-                              excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
-                              printf("Ingresso excluído!!!\n");
-                            }
-                          }
-                        }
-                        
-                    } else {
-                      printf("Codigo invalido, tente novamente...\n");
-                      //allPause();
-                    }
-
-
-              if(posX > 0)
-                    {
-                       // leituraIngresso(arqIngressos, buscaIngresso);
-                       	fseek(arqIngressos, 0, SEEK_SET);
-                        while(fread(&ingressos, sizeof(ingressos), 1, arqIngressos) != 0){
-                          if(ingressos.codigo == buscaIngresso){
-                          printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-                          printf("Deseja excluir o ingresso? (S ou N) \n");
-                          scanf(" %c", &userKey2);
-                          userKey2 = toupper(userKey2);
-                            if(userKey2=='S'){
-                              excluiIngresso(arqIngressos,posX);
-                              //ESSA FUNÇÃO NÃO PODE ESTAR AQUIgravaDadosEspecificoIngressos(arqIngressos, ingressos, posX);
-                              excluirFisicamenteIngressos(arqIngressos,"ingressos.csv");
-                              printf("Ingresso excluído!!!\n");
-                            }
-                          }
-                        }
-                        
-                    } else {
-                      printf("Codigo invalido, tente novamente...\n");
-                      //allPause();
-                    }
-
-*/
 							break;
 						case 5:
 							printf("\n\n\n*** GERENCIAMENTO DE CONTAS ***\n\n\n");
