@@ -9,29 +9,22 @@
 #include "gravacoes.h" //Biblioteca contendo funções de gravação
 #include "listagem.h" //Biblioteca contendo funções de listagem
 #include "leitura.h" //Biblioteca contendo funções de leitura
-#include "verificacoes.h"
+#include "verificacoes.h" //Biblioteca contendo funções de verificação
+#include "consultas.h" //Biblioteca contendo funções de consulta
+
 
 
 void cancelaCartaoUsr(FILE *arq, int reg);
 void excluirFisicamenteCartao (FILE **arqCard, char nome[]); // 2 asteriscos em arq
 void excluiIngresso(FILE *arq, int reg);
 void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
-int consultaNumeroCartao(FILE *arq, char busca[]);
-int consultaIngressos(FILE *arq, int busca);
-int consultaAdmin(FILE *arq, char buscaAdmin[]);
 void cancelaAdmin(FILE *arq, int reg);
 FILE *abreArquivo(char nomeArquivo[]);
 void excluirFisicamenteAdmin (FILE **arqAdm, char nome[]);
-int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod);
-void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
-void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
 int exportaCartaoXML(FILE *arqA);
-void listArqCar(FILE *arq);
-int listarArquivoCarrinho(FILE *arq);
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira);
-void gravaIngAlt(FILE *arq, struct tIngressos ing, int reg);
 
 
 //MAIN***********************************************************************************************
@@ -635,21 +628,7 @@ FILE *abreArquivo(char nomeArquivo[])
 //FIM  DO FILE
 
 
-int consultaNumeroCartao(FILE *arq, char busca[])
-{
-  struct tUsuario usr;
-  int reg = 0;
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&usr, sizeof(usr), 1, arq) != 0)
-  {
-    reg++;
-		if(strcmp(busca,usr.card.usrNumCartao)==0 && (usr.card.cartaoCancelado!='c'))
-    {
-      return reg; // 0 representa que achou o numero do cartao
-    }
-	}
-	return -1; // -1 representa não encontrado
-}
+
 
 
 
@@ -716,45 +695,10 @@ void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra vo
 	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
 }
 
-int consultaIngressos(FILE *arq, int busca)
-{
-  struct tIngressos ingressos;
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
-  {
-		if(ingressos.codigo == busca)
-    {
-      return 0; // 0 representa que achou o ingresso
-    }
-	}
-	return -1; // -1 representa não encontrado
-}
 
-int consultaCodShow(struct tIngressos *ing, FILE *arq, int cod)
-{
-  fseek(arq,0,SEEK_SET);
-  int reg = 0;
-  while(fread(&(*ing),sizeof(*ing),1,arq)!=0)
-  {
-    reg++;
-    if(cod==(*ing).codigo)
-    {
-      return reg; //Encontrou o codigo do show
-    }
-  }
-  return -1; //Não encontrou
-}
 
-void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg)
-{
-  if(reg <=0)
-  {
-    ing.cancelado = ' '; //Se não for feito isso, ele não cancela o negócio
-    fseek(arq,0,SEEK_END);
-  }
-  fseek(arq,(reg-1)*sizeof(ing),SEEK_SET);
-  fwrite(&ing, sizeof(ing), 1, arq);
-}
+
+
 
 void cancelaIngressoArqCarrinho(FILE *arq, int reg)
 {
@@ -792,16 +736,6 @@ void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int p
 
 
 
-void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
-{
-    if(reg <=0)
-    {
-      usr.card.cartaoCancelado = ' '; //Se não for feito isso, ele não cancela o negócio
-      fseek(arq,0,SEEK_END);
-    }
-    fseek(arq,(reg-1)*sizeof(usr),SEEK_SET);
-    fwrite(&usr, sizeof(usr), 1, arq);
-}
 
 int exportaCartaoXML(FILE *arqA)
 {
@@ -831,21 +765,6 @@ int exportaCartaoXML(FILE *arqA)
 
 
 
-int consultaAdmin(FILE *arq, char busca[])
-{
-  struct tAdministrador adm;
-  int reg = 0;
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&adm, sizeof(adm), 1, arq) != 0)
-  {
-    reg++;
-		if(strcmp(busca,adm.adminName)==0 && (adm.cancelado!='c'))
-    {
-      return reg; // 0 representa que achou o numero do cartao
-    }
-	}
-	return -1; // -1 representa não encontrado
-}
 
 void cancelaAdmin(FILE *arq, int reg)
 {
@@ -883,31 +802,7 @@ void excluirFisicamenteAdmin (FILE **arqAdm, char nome[])
   *arqAdm = abreArquivo(nome);
 }
 
-void listArqCar(FILE *arq)
-{
-    struct tIngressos ingressos;
-    fseek(arq, 0, SEEK_SET);
-    while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
-    {    
-            
-                printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-            
-    }
-}
 
-int listarArquivoCarrinho(FILE *arq)
-{
-  float val=0;
-  struct tIngressos ingressos;
-  fseek(arq, 0, SEEK_SET);
-  while(fread(&ingressos, sizeof(ingressos), 1, arq)!=0)
-  {   
-               printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
-               val+=ingressos.valor;
-
-  }
-  return val;
-}
 
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
 {
@@ -922,14 +817,3 @@ void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
 
 
 
-void gravaIngAlt(FILE *arq, struct tIngressos ing, int reg)
-{
-  
-	if(reg<=0)
-  {
-    fseek(arq,0,SEEK_END);
-  }else{
-    fseek(arq,(reg-1) * sizeof(struct tIngressos),SEEK_SET);
-    fwrite(&ing,sizeof(ing),1,arq);
-  }
-}
