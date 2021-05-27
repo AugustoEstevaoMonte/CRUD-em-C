@@ -43,7 +43,7 @@ int main (void){
   struct tIngressos ingressos;
   struct tNo *new, *administradores=NULL; //Struct tNo ligada a Administrador
   char nomeUser,userKey, userKey2;
-	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY;
+	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY, flag;
   int buscaIngresso;
   float saldoCarteira=0,totalIngressos=0;
 
@@ -65,15 +65,21 @@ int main (void){
 		
 		switch(opcaoMenuLogin){
 			case 1:
-				printf("\n\n\n*** ENTRAR ***\n\n\n");
+      do{
+        printf("\n\n\n*** ENTRAR ***\n\n\n");
         leValidaUsrNickname(usr.usrNickName);
         leValidaUsrPassword(usr.usrPassword);
         if(verificaSeLoginEsenhaCorrespondem(arqCadastro,usr.usrNickName,usr.usrPassword)==1)
         {
           printf(ERRO);
           allPause();
-          goto volta;
+          flag=0;
+        }else{
+          flag=1;
         }
+
+      }while(flag==0);
+				
 				//INICIO DO SUB-MENU PARA USER
 				do{
 					opcaoSMenuUser=menuUser();
@@ -314,15 +320,19 @@ int main (void){
 			}while(opcaoSMenuUser!=0);
 				break;
 			case 2:
-					printf("\n\n\n*** CADASTRAR ***\n\n\n");
-          leValidaUsrName(usr.usrName);
-          leValidaUsrNickname(usr.usrNickName);
-          if(verificaNicknameJaEstaEmUso(arqCadastro,usr.usrNickName)==1)
-          {
-            printf("Este nickname ja esta em uso, tente novamente...\n");
-            allPause();
-            goto volta;
-          }
+          do{
+              printf("\n\n\n*** CADASTRAR ***\n\n\n");
+              leValidaUsrName(usr.usrName);
+              leValidaUsrNickname(usr.usrNickName);
+              if(verificaNicknameJaEstaEmUso(arqCadastro,usr.usrNickName)==1)
+              {
+                printf("Este nickname ja esta em uso, tente novamente...\n");
+                allPause();
+                flag=0;
+              }else{
+                flag=1;
+              }
+          }while(flag==0);
           leValidaUsrPassword(usr.usrPassword);
           gravaDadosNoArquivoUsuario(arqCadastro,usr,-1); //Era pra escrever aqui
 					printf("Usuario cadastrado com sucesso...\n");
@@ -330,25 +340,29 @@ int main (void){
 				getchar();//allPause();
 				break;
 			case 3:
-				printf("\n\n\n*** ENTRAR COMO ADMINISTRADOR ***\n\n\n");
-				arqAdministrador = fopen("admin.csv","r+b");
-				if(arqAdministrador == NULL) //ARQ = NULL QUER DIZER QUE NÃO FOI ENCONTRADO NENHUM ADMIN/ARQUIVO,  Modificado hoje no dia 07/05/2021 
-				{
-					arqAdministrador = abreArquivo("admin.csv");
-					printf("Nenhum administrador encontrado, faca seu cadastro....\n");
-					leValidaUsrName(admin.adminName);
-					leValidaUsrPassword(admin.adminPassword);
-					gravaDadosArquivoAdministrador(arqAdministrador,admin);
-					printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
-				}
-				leValidaUsrName(admin.adminName);  // ADMINISTRADOR ENCOTRADO, INICIANDO LOGIN E SENHA Modificado hoje no dia 07/05/2021 
-				leValidaUsrPassword(admin.adminPassword);  //Modificado hoje no dia 07/05/2021 
-				if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)  //Modificado hoje no dia 07/05/2021 
-				{
-					printf(ERRO);
-					allPause();
-					goto volta;
-				}
+      do{
+          printf("\n\n\n*** ENTRAR COMO ADMINISTRADOR ***\n\n\n");
+          arqAdministrador = fopen("admin.csv","r+b");
+          if(arqAdministrador == NULL) //ARQ = NULL QUER DIZER QUE NÃO FOI ENCONTRADO NENHUM ADMIN/ARQUIVO,  Modificado hoje no dia 07/05/2021 
+          {
+            arqAdministrador = abreArquivo("admin.csv");
+            printf("Nenhum administrador encontrado, faca seu cadastro....\n");
+            leValidaUsrName(admin.adminName);
+            leValidaUsrPassword(admin.adminPassword);
+            gravaDadosArquivoAdministrador(arqAdministrador,admin);
+            printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
+          }
+          leValidaUsrName(admin.adminName);  // ADMINISTRADOR ENCOTRADO, INICIANDO LOGIN E SENHA Modificado hoje no dia 07/05/2021 
+          leValidaUsrPassword(admin.adminPassword);  //Modificado hoje no dia 07/05/2021 
+          if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)  //Modificado hoje no dia 07/05/2021 
+          {
+            printf(ERRO);
+            allPause();
+            flag=0;
+          }else{
+            flag=1;
+          }
+      }while (flag==0);
 				printf("LOGIN REALIZADO COM SUCESSO!!!!\n"); // //Modificado hoje no dia 07/05/2021
 				allPause();
 				//INICIO DO SUB-MENU PARA ADMINISTRADOR
