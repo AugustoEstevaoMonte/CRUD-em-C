@@ -455,6 +455,36 @@ int main (void){
 						case 4:
 							printf("\n\n\n*** EXCLUIR INGRESSOS ***\n\n\n");
 
+                   
+                      printf("Digite aqui o codigo do ingresso: \n");
+                      
+                      setbuf(stdin,NULL);
+                      fscanf(stdin, "%d", &ingressos.codigo);
+
+                    posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
+                    if(posX > 0)
+                    {   
+                        setbuf(stdin,NULL);
+                        //usr = lerUser(posX, arqCartaoUsuario);
+                          fseek(arqIngressos,(posX-1)*sizeof(struct tIngressos),SEEK_SET);
+                          //fread(&ingressos,sizeof(ingressos),1,arqIngressos);
+
+                        printf("Numero do codigo: %d\n",ingressos.codigo);printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
+                        printf("Deseja remover o ingresso? (S ou N) \n");
+                        setbuf(stdin,NULL); 
+                        scanf("%c",&userKey);
+                        userKey = toupper(userKey);
+                        if(userKey=='S')
+                        {
+                          excluiIngresso(arqIngressos,posX);
+                          excluirFisicamenteIngressos(&arqIngressos,"ingressos.csv");
+                          printf("Ingresso excluido\n");
+                        }
+                    } else {
+                      printf("Ingresso indisponivel\n");
+                    }
+                      
+/*
               printf("Digite aqui o codigo do ingresso que deseja excluir: \n");
               //fscanf(stdin, "%d", &ingressos.codigo);
               scanf("%d", &buscaIngresso);
@@ -512,7 +542,7 @@ int main (void){
                       //allPause();
                     }
 
-
+*/
 							break;
 						case 5:
 							printf("\n\n\n*** GERENCIAMENTO DE CONTAS ***\n\n\n");

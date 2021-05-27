@@ -4,7 +4,7 @@
 void cancelaCartaoUsr(FILE *arq, int reg);
 void excluirFisicamenteCartao (FILE **arqCard, char nome[]);
 void excluiIngresso(FILE *arq, int reg);
-void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
+void excluirFisicamenteIngressos (FILE **arq, char ingresso[]);
 void cancelaAdmin(FILE *arq, int reg);
 void excluirFisicamenteAdmin (FILE **arqAdm, char nome[]);
 void cancelaIngressoArqCarrinho(FILE *arq, int reg);
@@ -49,27 +49,34 @@ void excluirFisicamenteCartao (FILE **arqCard, char nome[]){
 void excluiIngresso(FILE *arq, int reg)
 {
 	struct tIngressos ingressos;
-	fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
+	fseek(arq, (reg-1)*sizeof(ingressos), SEEK_SET);
+  fread(&ingressos, sizeof(ingressos), 1, arq);
 	ingressos.cancelado = 'c';
+  fseek(arq, -sizeof(ingressos), SEEK_CUR);
 	fwrite(&ingressos, sizeof(ingressos), 1, arq);
-
 }
 
-void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){
-	FILE *arqAux = fopen("ingressosAux.dat", "wb");
+void excluirFisicamenteIngressos (FILE **arq, char ingresso[]){
+	FILE *arqAux = fopen("ingressosAux.aux", "a+b");
 	struct tIngressos ingressos;
+
+  if(arqAux == NULL){
+    printf("Erro de abertura\n");
+    return;
+  }
 	
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
+	fseek(*arq, 0, SEEK_SET);
+	while(fread(&ingressos, sizeof(ingressos), 1, *arq))
 		if(ingressos.cancelado != 'c')
     {
       fwrite(&ingressos, sizeof(ingressos), 1, arqAux);
     }
 	
-	fclose(arq);
+	fclose(*arq);
 	fclose(arqAux);
 	remove(ingresso);
-	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
+	rename("ingressosAux.aux", ingresso);
+  *arq = abreArquivo(ingresso);
 }
 
 
