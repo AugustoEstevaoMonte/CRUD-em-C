@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "funcoesuteis.h" //Contém AllPause e abreArquivo
 #include "menus.h" //Biblioteca criada no dia 11/05 para os "Menus"
 #include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
 #include "structs.h" //Biblioteca contendo structs | OBS: ELA SEMPRE DEVE ESTAR EM PRIMEIRO NA INCLUSAO |
@@ -11,19 +12,8 @@
 #include "leitura.h" //Biblioteca contendo funções de leitura
 #include "verificacoes.h" //Biblioteca contendo funções de verificação
 #include "consultas.h" //Biblioteca contendo funções de consulta
+#include "exclusaocancelamento.h"
 
-
-
-void cancelaCartaoUsr(FILE *arq, int reg);
-void excluirFisicamenteCartao (FILE **arqCard, char nome[]); // 2 asteriscos em arq
-void excluiIngresso(FILE *arq, int reg);
-void excluirFisicamenteIngressos (FILE *arq, char ingresso[]);
-void cancelaAdmin(FILE *arq, int reg);
-FILE *abreArquivo(char nomeArquivo[]);
-void excluirFisicamenteAdmin (FILE **arqAdm, char nome[]);
-void cancelaIngressoArqCarrinho(FILE *arq, int reg);
-void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]);
-int exportaCartaoXML(FILE *arqA);
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira);
 
 
@@ -610,199 +600,6 @@ int main (void){
   fclose(arqCarrinho);
 	return 0;
 }
-
-
-
-//INICIO DO FILE
-FILE *abreArquivo(char nomeArquivo[])
-{
-  FILE *arq;
-	arq = fopen(nomeArquivo, "r+b");
-	if(arq == NULL)
-  {
-    arq = fopen(nomeArquivo, "w+b");
-  }
-		
-	return arq;
-}
-//FIM  DO FILE
-
-
-
-
-
-
-void cancelaCartaoUsr(FILE *arq, int reg)
-{
-	struct tUsuario usr;
-	fseek(arq, (reg-1)*sizeof(usr), SEEK_SET);
-  fread(&usr,sizeof(usr),1,arq);
-	usr.card.cartaoCancelado = 'c';
-  fseek(arq,-sizeof(usr), SEEK_CUR);
-	fwrite(&usr, sizeof(usr), 1, arq);
-
-}
-
-void excluirFisicamenteCartao (FILE **arqCard, char nome[]){//mudar int pra void
-	FILE *arqAux = fopen("infoCartao.aux", "a+b");
-	struct tUsuario usr;
-	
-	if(arqAux == NULL){
-		printf("Erro de abertura!!!");
-		return;
-	}
-	
-	fseek(*arqCard, 0, SEEK_SET);
-	while(fread(&usr, sizeof(usr), 1, *arqCard))
-		if(usr.card.cartaoCancelado != 'c')
-    {
-      fwrite(&usr, sizeof(usr), 1, arqAux);
-    }
-	
-	fclose(*arqCard);
-	fclose(arqAux);
-	remove(nome);
-	rename("infoCartao.aux", nome); //
-  *arqCard = abreArquivo(nome);
-}
-
-
-
-void excluiIngresso(FILE *arq, int reg)
-{
-	struct tIngressos ingressos;
-	fseek(arq, sizeof(ingressos)*reg, SEEK_SET);
-	ingressos.cancelado = 'c';
-	fwrite(&ingressos, sizeof(ingressos), 1, arq);
-
-}
-
-
-void excluirFisicamenteIngressos (FILE *arq, char ingresso[]){//mudar int pra void
-	FILE *arqAux = fopen("ingressosAux.dat", "wb");
-	struct tIngressos ingressos;
-	
-	fseek(arq, 0, SEEK_SET);
-	while(fread(&ingressos, sizeof(ingressos), 1, arq) != 0)
-		if(ingressos.cancelado != 'c')
-    {
-      fwrite(&ingressos, sizeof(ingressos), 1, arqAux);
-    }
-	
-	fclose(arq);
-	fclose(arqAux);
-	remove(ingresso);
-	rename("ingressosAux.dat", ingresso); // .dat pode dar erro por estar em .cvs na main
-}
-
-
-
-
-
-
-void cancelaIngressoArqCarrinho(FILE *arq, int reg)
-{
-	struct tIngressos ing;
-	fseek(arq, (reg-1)*sizeof(ing), SEEK_SET);
-  fread(&ing,sizeof(ing),1,arq);
-	ing.cancelado = 'c';
-  fseek(arq,-sizeof(ing), SEEK_CUR);
-	fwrite(&ing, sizeof(ing), 1, arq);
-
-}
-
-void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int pra void
-	FILE *arqAux = fopen("carrinhoUser.aux", "a+b");
-	struct tIngressos ing;
-	
-	if(arqAux == NULL){
-		printf("Erro de abertura!!!");
-		return;
-	}
-	
-	fseek(*arqCarrinho, 0, SEEK_SET);
-	while(fread(&ing, sizeof(ing), 1, *arqCarrinho))
-		if(ing.cancelado != 'c')
-    {
-      fwrite(&ing, sizeof(ing), 1, arqAux);
-    }
-	
-	fclose(*arqCarrinho);
-	fclose(arqAux);
-	remove(nome);
-	rename("carrinhoUser.aux", nome); //
-  *arqCarrinho = abreArquivo(nome);
-}
-
-
-
-
-int exportaCartaoXML(FILE *arqA)
-{
-  char ch;
-  FILE *arq = fopen("dados.xml","w+b");
-  if(arq==NULL || arqA == NULL)
-  {
-    return 0;
-  }
-
-  fseek(arqA,0,SEEK_SET);
-  while(!feof(arqA))
-  {
-    ch = fgetc(arqA);
-    if(ch !=EOF)
-    {
-       fputc(ch, arq);
-    }
-  }
-
-  fclose(arq);
-  return 0;
-}
-
-
-
-
-
-
-
-void cancelaAdmin(FILE *arq, int reg)
-{
-	struct tAdministrador adm;
-	fseek(arq, (reg-1)*sizeof(adm), SEEK_SET);
-  fread(&adm,sizeof(adm),1,arq);
-	adm.cancelado = 'c';
-  fseek(arq,-sizeof(adm), SEEK_CUR);
-	fwrite(&adm, sizeof(adm), 1, arq);
-
-}
-
-
-void excluirFisicamenteAdmin (FILE **arqAdm, char nome[])
-{
-	FILE *arqAux = fopen("admin.aux", "a+b");
-	struct tAdministrador adm;
-	
-	if(arqAux == NULL){
-		printf("Erro de abertura!!!");
-		return;
-	}
-	
-	fseek(*arqAdm, 0, SEEK_SET);
-	while(fread(&adm, sizeof(adm), 1, *arqAdm))
-		if(adm.cancelado != 'c')
-    {
-      fwrite(&adm, sizeof(adm), 1, arqAux);
-    }
-	
-	fclose(*arqAdm);
-	fclose(arqAux);
-	remove(nome);
-	rename("admin.aux", nome); //
-  *arqAdm = abreArquivo(nome);
-}
-
-
 
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
 {

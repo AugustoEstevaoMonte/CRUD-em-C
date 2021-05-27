@@ -4,21 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void allPause();
 int menuLogin();
 int menuUser();
 int menuPagamento();
 int menuCarrinho();
 int menuGerenciamento();
 
-void allPause()
-{
-  char allP;
-  printf("Pressione qualquer tecla para continuar...\n");
-  setbuf(stdin,NULL);
-  allP = getchar();
-  system("cls||clear");
-} 
+
 
 int menuLogin()
 {
