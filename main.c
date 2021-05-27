@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "funcoesuteis.h" //Contém AllPause e abreArquivo
+#include "funcoesuteis.h" //Contém AllPause, abreArquivo e exportarXML
 #include "menus.h" //Biblioteca criada no dia 11/05 para os "Menus"
 #include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
 #include "structs.h" //Biblioteca contendo structs | OBS: ELA SEMPRE DEVE ESTAR EM PRIMEIRO NA INCLUSAO |
@@ -50,7 +50,9 @@ int main (void){
 			case 1:
       do{
         printf("\n\n\n*** ENTRAR ***\n\n\n");
+        setbuf(stdin,NULL);
         leValidaUsrNickname(usr.usrNickName);
+        setbuf(stdin,NULL);
         leValidaUsrPassword(usr.usrPassword);
         if(verificaSeLoginEsenhaCorrespondem(arqCadastro,usr.usrNickName,usr.usrPassword)==1)
         {
@@ -74,6 +76,7 @@ int main (void){
 					switch(opcaoSMenuUser){
 						case 1:
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
+              setbuf(stdin,NULL);
               listagemIngressos(arqIngressos);
               
 							break;
@@ -107,6 +110,7 @@ int main (void){
                         do
                       {
                         printf("Digite aqui o CV do cartao: \n");
+                        setbuf(stdin,NULL);
                         scanf("%d",&usr.card.cvCard);
                         erroFunc = leValidaCVcard(usr.card.cvCard);
                         if(erroFunc==1)
@@ -116,7 +120,7 @@ int main (void){
                         }
 										  }while(erroFunc==1);
 
-
+                        setbuf(stdin,NULL);
                         gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
@@ -147,7 +151,7 @@ int main (void){
 
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
-                    {
+                    {   setbuf(stdin,NULL);
                         usr = lerUser(posX, arqCartaoUsuario);
                         printf("Numero do cartao: %s\n",usr.card.usrNumCartao); 
                         printf("Deseja remover o cartao? (S ou n) \n");
@@ -181,7 +185,7 @@ int main (void){
                     }while(erroFunc==1);
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
-                    {
+                    { setbuf(stdin,NULL);
                       lerCarteiraUser(arqCartaoUsuario,&usr);
                       printf("Digite um valor que deseja adicionar: \n");
                       scanf("%f",&saldoCarteira);
@@ -208,16 +212,20 @@ int main (void){
 								switch(opcaoSSMenuCarrinho){
 									case 1:
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
+                    setbuf(stdin,NULL);
                     listArqCar(arqCarrinho);
 										break;
 									case 2:
 										printf("\n\n\n*** ADICIONAR ITEM ***\n\n\n");
                     listagemIngressos(arqIngressos);
+                    setbuf(stdin,NULL);
                     printf("Digite aqui o codigo do ingresso que deseja adicionar...\n");
+                    setbuf(stdin,NULL);
                     ingressos.codigo=leValidaCodigo();
                     posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
                     if(posX > 0)
                     {
+                       setbuf(stdin,NULL);
                        ingressos = lerIngressos(posX, arqIngressos);
                        printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\nValor: %0.2f\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim,ingressos.valor);
                        gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
@@ -235,10 +243,9 @@ int main (void){
                     ingressos.codigo = leValidaCodigo();
                     posX = consultaCodShow(&ingressos,arqIngressos,ingressos.codigo);
                     if(posX > 0)
-                    {
+                    {  setbuf(stdin,NULL);
                        ingressos = lerIngressos(posX, arqIngressos);
                        printf("Nome do Artista: %s\nLocal: %s\nInicio: %i:%i - Final: %i:%i\n",ingressos.banda,ingressos.local,ingressos.horaIni,ingressos.minIni,ingressos.horaFim,ingressos.minFim);
-                       gravaDadosNoArquivoCarrinho(arqCarrinho,ingressos,posX);
                        printf("Tem certeza que deseja excluir? (S ou n)\n");
                        setbuf(stdin,NULL);
                        scanf("%c",&userKey);
@@ -259,7 +266,7 @@ int main (void){
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
                     totalIngressos = listarArquivoCarrinho(arqCarrinho);
                     if(totalIngressos > 0.0 )
-                    {
+                    { 
                       ingressos = lerIngressos(0,arqCarrinho);
                       printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
                       usr = lerUser(0,arqCadastro);
@@ -288,6 +295,7 @@ int main (void){
               case 4:
               printf("\n\n*** CONSULTA ***\n\n");
               printf("Digite aqui o codigo do ingresso: ");
+              setbuf(stdin,NULL);
               scanf("%d", &buscaIngresso);
               posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
               if(posX > 0){
@@ -305,7 +313,9 @@ int main (void){
 			case 2:
           do{
               printf("\n\n\n*** CADASTRAR ***\n\n\n");
+              setbuf(stdin,NULL);
               leValidaUsrName(usr.usrName);
+              setbuf(stdin,NULL);
               leValidaUsrNickname(usr.usrNickName);
               if(verificaNicknameJaEstaEmUso(arqCadastro,usr.usrNickName)==1)
               {
