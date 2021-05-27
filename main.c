@@ -186,11 +186,20 @@ int main (void){
                     if(posX > 0)
                     { setbuf(stdin,NULL);
                       lerCarteiraUser(arqCartaoUsuario,&usr);
-                      printf("Digite um valor que deseja adicionar: \n");
-                      scanf("%f",&saldoCarteira);
-                      usr.valorCarteira+=saldoCarteira;
-                      printf("VALOR ADICIONADO COM SUCESSO!!\n");
-                      gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
+                      printf("Deseja adicionar o valor na carteira? (S ou n) \n");
+                      setbuf(stdin,NULL);
+                      scanf("%c",&userKey);
+                      userKey = toupper(userKey);
+                      if(userKey=='S')
+                      {    
+                          printf("Digite um valor que deseja adicionar: \n");
+                          scanf("%f",&saldoCarteira);
+                          usr.valorCarteira+=saldoCarteira;
+                          printf("VALOR ADICIONADO COM SUCESSO!!\n");
+                          gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
+                      }else{
+                        printf("Transacao abortada pelo usuario...\n");
+                      }
                     } else{
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                     }

@@ -29,7 +29,7 @@ void leValidaUsrName(char nomeUser[])
 
        if(strlen(nomeUser)==1 || strlen(nomeUser)<=5)
        {
-         printf("Nome de usuario invalido, necessita ter pelo menos 6 caracteres...\n");
+         printf("Nome de usuario invalido, necessita ter pelo menos 5 caracteres...\n");
        }
 
   }while(strlen(nomeUser)==1 || strlen(nomeUser)<=5);
@@ -45,7 +45,7 @@ void leValidaUsrNickname(char nickUser[])
 
        if(strlen(nickUser)==1 || strlen(nickUser)<=5)
        {
-         printf("Nickname invalido, necessita ter pelo menos 6 caracteres...\n");
+         printf("Nickname invalido, necessita ter pelo menos 5 caracteres...\n");
        }
 
   }while(strlen(nickUser)==1 || strlen(nickUser)<=5);
@@ -61,7 +61,7 @@ void leValidaUsrPassword(char passwordUser[])
 
        if(strlen(passwordUser)==1 || strlen(passwordUser)<=5)
        {
-         printf("Senha invalida, necessita ter pelo menos 6 caracteres...\n");
+         printf("Senha invalida, necessita ter pelo menos 5 caracteres...\n");
        }
 
   }while(strlen(passwordUser)==1 || strlen(passwordUser)<=5);
