@@ -35,4 +35,9 @@
 - [x] CRUD <br>
 
 
+<h1>Autores</h1>
+- Augusto Estevão Monte<br>
+- Rafaela Mendonça Amâncio
+
+
 
