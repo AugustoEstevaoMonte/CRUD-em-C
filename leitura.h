@@ -4,7 +4,7 @@
 
 struct tUsuario lerUser(int reg, FILE *arq);
 void leituraUsuario(FILE *arq);
-void lerCarteiraUser(FILE *arq, struct tUsuario *usr);
+struct tUsuario lerCarteiraUsr(int reg, FILE *arq);
 void leituraIngresso(FILE *arq, int busca);
 struct tIngressos lerIngressos(int reg, FILE *arq);
 struct tAdministrador lerAdministrador(int reg, FILE *arq);
@@ -26,13 +26,13 @@ void leituraUsuario(FILE *arq)
 	fread(&usr,sizeof(usr),1,arq);
 }
 
-void lerCarteiraUser(FILE *arq, struct tUsuario *usr)
+
+struct tUsuario lerCarteiraUsr(int reg, FILE *arq)
 {
-	  fseek(arq, 0, SEEK_SET);
-	  while(fread(&(*usr),sizeof(*usr),1,arq)!=0)
-    {
-      printf("O valor na carteira e de: %0.2f R$\n",(*usr).valorCarteira);
-    }
+  struct tUsuario usr;
+  fseek(arq,(reg-1)*sizeof(struct tUsuario),SEEK_SET);
+  fread(&usr,sizeof(usr),1,arq);
+  return usr;
 }
 
 void leituraIngresso(FILE *arq, int busca)

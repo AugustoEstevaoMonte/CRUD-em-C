@@ -75,7 +75,7 @@ void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
       usr.card.cartaoCancelado = ' '; //Se não for feito isso, ele não cancela o negócio
       fseek(arq,0,SEEK_END);
     }
-    fseek(arq,(reg-1)*sizeof(usr),SEEK_SET);
+    fseek(arq,(reg-1)*sizeof(struct tUsuario),SEEK_SET);
     fwrite(&usr, sizeof(usr), 1, arq);
 }
 

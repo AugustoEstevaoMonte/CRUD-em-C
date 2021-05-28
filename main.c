@@ -14,7 +14,8 @@
 #include "consultas.h" //Biblioteca contendo funções de consulta
 #include "exclusaocancelamento.h"
 
-void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira);
+void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[]);
+void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg);
 
 
 //MAIN***********************************************************************************************
@@ -124,6 +125,7 @@ int main (void){
                         printf("CADASTRADO COM SUCESSO!!\n");
                         printf("Numero cartao: %s\n",usr.card.usrNumCartao);
                         printf("CV cartao: %d\n",usr.card.cvCard);
+                        usr.valorCarteira = 0;
                     }else{
                       printf("Numero de cartao ja inserido anteriormente...\n");
                       allPause();
@@ -185,7 +187,8 @@ int main (void){
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
                     { setbuf(stdin,NULL);
-                      lerCarteiraUser(arqCartaoUsuario,&usr);
+                     usr =  lerCarteiraUsr(posX,arqCartaoUsuario);
+                      printf("Valor na carteira: %0.2f\n",usr.valorCarteira);
                       printf("Deseja adicionar o valor na carteira? (S ou n) \n");
                       setbuf(stdin,NULL);
                       scanf("%c",&userKey);
@@ -258,7 +261,7 @@ int main (void){
                        setbuf(stdin,NULL);
                        scanf("%c",&userKey);
                        userKey = toupper(userKey);
-                       if(userKey=='S') //Se o userKey pegar lixo de memória ele não grava no arquivo o ingresso excluido.
+                       if(userKey=='S') 
                        {
                          cancelaIngressoArqCarrinho(arqCarrinho,posX);
                          excluirFisicamenteCarrrinho (&arqCarrinho,"carrinhoUser.csv");
@@ -272,29 +275,49 @@ int main (void){
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
-                    totalIngressos = listarArquivoCarrinho(arqCarrinho);
-                    if(totalIngressos > 0.0 )
-                    { 
-                      ingressos = lerIngressos(0,arqCarrinho);
-                      printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
-                      usr = lerUser(0,arqCadastro);
-                      lerCarteiraUser(arqCartaoUsuario,&usr); //Exibe o valor da carteira
-                      printf("Deseja continuar com a transacao? (S ou N)\n");
+                    printf("Confirme o numero do seu cartao...\n");
+
+                    do
+                    {
+                      printf("Digite aqui o numero do cartao: \n");
                       setbuf(stdin,NULL);
-                      scanf("%c",&userKey);
-                      userKey = toupper(userKey);
-                      if(userKey=='S')
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
+                      if(erroFunc==1)
                       {
-                          subtraiValores(&usr,totalIngressos,arqCartaoUsuario);
-                          cancelaCartaoUsr(arqCartaoUsuario,0);
-                          excluirFisicamenteCartao (&arqCartaoUsuario,"infoCartao.csv");
-                          gravaDadosArqCartao(arqCartaoUsuario,usr,0);
-                          printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
-                      } else{
-                        printf("Transacao abortada pelo usuario...\n");
+                        printf("Numero de cartao invalido, tente novamente...\n");
                       }
-                    }else{
-                      printf("Não foi encontrado nenhum dado...\n");
+                      
+                    }while(erroFunc==1);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
+                    if(posX > 0)
+                    { 
+                          totalIngressos = listarArquivoCarrinho(arqCarrinho);
+                          if(totalIngressos > 0.0 )
+                          { 
+                            ingressos = lerIngressos(posX,arqCarrinho);
+                            printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
+                            usr = lerCarteiraUsr(posX,arqCartaoUsuario); //Alterei aqui
+                            printf("Voce tem na carteira: %0.2f\n",usr.valorCarteira);//Exibe o valor da carteira
+                            printf("Deseja continuar com a transacao? (S ou N)\n");
+                            setbuf(stdin,NULL);
+                            scanf("%c",&userKey);
+                            userKey = toupper(userKey);
+                            if(userKey=='S')
+                            {
+                                subtraiValores(&usr,totalIngressos,arqCartaoUsuario,usr.card.usrNumCartao);
+                                gravaCardAlt(arqCartaoUsuario,usr,posX);//ESTOU AQUI
+                                //gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
+                                printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
+                            } else{
+                              printf("Transacao abortada pelo usuario...\n");
+                            }
+                          }else{
+                            printf("Não foi encontrado nenhum dado...\n");
+                          }
+                    
+                    } else {
+                      printf(ERRO);
                     }
 										break;
 								}
@@ -588,15 +611,29 @@ int main (void){
 	return 0;
 }
 
-void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira)
+void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[])
 {
   fseek(arqCarteira, 0, SEEK_SET);
 	  while(fread(&(*usr),sizeof(*usr),1,arqCarteira)!=0)
     {
-      (*usr).valorCarteira-=valor;
-      printf("O novo valor e de: %0.2f R$\n",(*usr).valorCarteira);
+      if(strcmp((*usr).card.usrNumCartao,numCard)==0)
+      {
+            (*usr).valorCarteira-=valor;
+            printf("O novo valor e de: %0.2f R$\n",(*usr).valorCarteira);
+      }
     }
 
+}
+
+void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg)
+{
+  if(reg<=0)
+  {
+    fseek(arq,0,SEEK_END);
+  }else{
+    fseek(arq,(reg-1) * sizeof(struct tUsuario),SEEK_SET);
+    fwrite(&usr,sizeof(usr),1,arq);
+  }
 }
 
 
