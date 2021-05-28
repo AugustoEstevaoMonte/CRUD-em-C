@@ -15,7 +15,6 @@
 #include "exclusaocancelamento.h"
 
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[]);
-void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg);
 
 
 //MAIN***********************************************************************************************
@@ -61,6 +60,7 @@ int main (void){
           flag=0;
         }else{
           flag=1;
+          usr.valorCarteira = 0;
         }
 
       }while(flag==0);
@@ -289,6 +289,8 @@ int main (void){
                       }
                       
                     }while(erroFunc==1);
+
+                    
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
                     if(posX > 0)
                     { 
@@ -307,7 +309,6 @@ int main (void){
                             {
                                 subtraiValores(&usr,totalIngressos,arqCartaoUsuario,usr.card.usrNumCartao);
                                 gravaCardAlt(arqCartaoUsuario,usr,posX);//ESTOU AQUI
-                                //gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
                                 printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
                             } else{
                               printf("Transacao abortada pelo usuario...\n");
@@ -358,6 +359,7 @@ int main (void){
               }
           }while(flag==0);
           leValidaUsrPassword(usr.usrPassword);
+          usr.valorCarteira = 0;
           gravaDadosNoArquivoUsuario(arqCadastro,usr,-1); //Era pra escrever aqui
 					printf("Usuario cadastrado com sucesso...\n");
         
@@ -625,16 +627,7 @@ void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char n
 
 }
 
-void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg)
-{
-  if(reg<=0)
-  {
-    fseek(arq,0,SEEK_END);
-  }else{
-    fseek(arq,(reg-1) * sizeof(struct tUsuario),SEEK_SET);
-    fwrite(&usr,sizeof(usr),1,arq);
-  }
-}
+
 
 
 

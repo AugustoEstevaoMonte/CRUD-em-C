@@ -8,6 +8,7 @@ void gravaDadosEspecificoIngressos(FILE *arq, struct tIngressos ingressos, int r
 void gravaIngAlt(FILE *arq, struct tIngressos ing, int reg);
 void gravaDadosNoArquivoCarrinho(FILE *arq, struct tIngressos ing, int reg);
 void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg);
+void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg);
 
 void gravaDadosNoArquivoUsuario(FILE *arq, struct tUsuario usr, int reg) 
 {
@@ -77,6 +78,17 @@ void gravaDadosArqCartao(FILE *arq, struct tUsuario usr, int reg)
     }
     fseek(arq,(reg-1)*sizeof(struct tUsuario),SEEK_SET);
     fwrite(&usr, sizeof(usr), 1, arq);
+}
+
+void gravaCardAlt(FILE *arq, struct tUsuario usr, int reg)
+{
+  if(reg<=0)
+  {
+    fseek(arq,0,SEEK_END);
+  }else{
+    fseek(arq,(reg-1) * sizeof(struct tUsuario),SEEK_SET);
+    fwrite(&usr,sizeof(usr),1,arq);
+  }
 }
 
 #endif
