@@ -310,6 +310,8 @@ int main (void){
                                 subtraiValores(&usr,totalIngressos,arqCartaoUsuario,usr.card.usrNumCartao);
                                 gravaCardAlt(arqCartaoUsuario,usr,posX);//ESTOU AQUI
                                 printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
+                                cancelaIngressoArqCarrinho(arqCarrinho,posX);
+                                excluirFisicamenteCarrrinho(&arqCarrinho,"carrinhoUser.csv");
                             } else{
                               printf("Transacao abortada pelo usuario...\n");
                             }
