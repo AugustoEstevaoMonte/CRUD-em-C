@@ -58,8 +58,7 @@ int main (void){
         leValidaUsrNickname(usr.usrNickName);
         setbuf(stdin,NULL);
         leValidaUsrPassword(usr.usrPassword);
-        if(verificaSeLoginEsenhaCorrespondem(arqCadastro,usr.usrNickName,usr.usrPassword)==1)
-        {
+        if(verificaSeLoginEsenhaCorrespondem(arqCadastro,usr.usrNickName,usr.usrPassword)==1){
           printf(ERRO);
           allPause();
           flag=0;
@@ -95,14 +94,13 @@ int main (void){
 								// 0 - Voltar
 								switch(opcaoSSMenuPagamento){
 									case 1:
-                    do
-                    {    printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
+                    do{    
+                          printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
                           printf("Digite aqui o numero do cartao: \n");
                           setbuf(stdin,NULL);
                           fgets(usr.card.usrNumCartao,MAX,stdin);
                           erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
-                          if(erroFunc==1)
-                          {
+                          if(erroFunc==1){
                             printf("O cartao precisa ter no minimo 8 numeros...\n");
                             allPause();
                           }
@@ -110,16 +108,13 @@ int main (void){
                     }while(erroFunc==1);
 
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
-                    if(posX==-1)
-                    {
-                        do
-                      {
+                    if(posX==-1){
+                        do{
                         printf("Digite aqui o CV do cartao: \n");
                         setbuf(stdin,NULL);
                         scanf("%d",&usr.card.cvCard);
                         erroFunc = leValidaCVcard(usr.card.cvCard);
-                        if(erroFunc==1)
-                        {
+                        if(erroFunc==1){
                              printf("O CV precisa ter 3 digitos...\n");
                              allPause();
                         }
@@ -142,22 +137,20 @@ int main (void){
 										break;
 									case 2:
 										printf("\n\n\n*** RETIRAR CARTAO ***\n\n\n");
-                    do
-                    {
+                    do{
                       printf("Digite aqui o numero do cartao que deseja remover: \n");
                       setbuf(stdin,NULL);
                       fgets(usr.card.usrNumCartao,MAX,stdin);
                       erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
-                      if(erroFunc==1)
-                      {
+                      if(erroFunc==1){
                         printf("Numero de cartao invalido, tente novamente...\n");
                       }
                       
                     }while(erroFunc==1);
 
                     posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
-                    if(posX > 0)
-                    {   setbuf(stdin,NULL);
+                    if(posX > 0){   
+                        setbuf(stdin,NULL);
                         usr = lerUser(posX, arqCartaoUsuario);
                         printf("Numero do cartao: %s\n",usr.card.usrNumCartao); 
                         printf("Deseja remover o cartao? (S ou n) \n");
