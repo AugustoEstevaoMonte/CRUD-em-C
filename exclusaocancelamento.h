@@ -127,18 +127,19 @@ void cancelaIngressoArqCarrinho(FILE *arq, int reg)
 }
 
 void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int pra void
-	FILE *arqAux = fopen("carrinhoUser.aux", "a+b");
+	FILE *arqAux = fopen("carrinhoUser.aux", "w");
 	struct tIngressos ing;
 	
 	if(arqAux == NULL){
 		printf("Erro de abertura!!!");
 		return;
 	}
-	
+  setbuf(stdin,NULL);
 	fseek(*arqCarrinho, 0, SEEK_SET);
 	while(fread(&ing, sizeof(ing), 1, *arqCarrinho))
 		if(ing.cancelado != 'c')
     {
+      
       fwrite(&ing, sizeof(ing), 1, arqAux);
     }
 	
