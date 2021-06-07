@@ -33,6 +33,7 @@
 ## Construção do Projeto:
 - [x] Headers (garantir modularização do projeto)<br>
 - [x] CRUD <br>
+- [x] Exporta arquivos persistentes para XML <br>
 
 
 <h1>Autores</h1>
