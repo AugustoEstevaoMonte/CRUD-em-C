@@ -305,7 +305,7 @@ int main (void){
                     { 
                           totalIngressos = listarArquivoCarrinho(arqCarrinho);
                           totCart = totalNaCarteira(arqCartaoUsuario);
-                          if(totalIngressos <= totCart )
+                          if(totalIngressos <= totCart && totalIngressos>0.0)
                           { 
                             ingressos = lerIngressos(posX,arqCarrinho);
                             printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
@@ -320,6 +320,7 @@ int main (void){
                                 subtraiValores(&usr,totalIngressos,arqCartaoUsuario,usr.card.usrNumCartao);
                                 gravaCardAlt(arqCartaoUsuario,usr,posX);//ESTOU AQUI
                                 printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
+                                setbuf(stdin,NULL);
                                 cancelaIngressoArqCarrinho(arqCarrinho,posX);
                                 excluirFisicamenteCarrrinho(&arqCarrinho,"carrinhoUser.csv");
                             } else{
