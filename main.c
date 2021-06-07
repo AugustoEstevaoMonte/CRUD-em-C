@@ -20,6 +20,7 @@ int exportarCadastroXML(FILE *arq, char nome[]);
 int exportarCardXML(FILE *arq, char nome[]);
 int exportarIngressosXML(FILE *arq, char nome[]);
 int exportarAdminXML(FILE *arq, char nome[]);
+int totalNaCarteira(FILE *arq);
 
 
 //MAIN***********************************************************************************************
@@ -31,7 +32,7 @@ int main (void){
   struct tIngressos ingressos;
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY, flag;
-  int buscaIngresso;
+  int buscaIngresso,totCart=0;
   float saldoCarteira=0,totalIngressos=0;
 
 
@@ -43,7 +44,7 @@ int main (void){
 
   // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
 	do{
-	volta: opcaoMenuLogin = menuLogin();  // :volta é usado pela função goto(volta) na linha 125 do CADASTRO, é usado para voltar ao MENU !!!!!!GAMBIARRA ATÉ SURGIR OUTRA SOLUÇÃO MELHOR
+	opcaoMenuLogin = menuLogin();
 		//primeiro menu, onde tem:
 		// 1 - Entrar
 		// 2 - Cadastrar
@@ -91,6 +92,8 @@ int main (void){
 								// 1 - Adicionar cartao
 								// 2 - Retirar cartao
 								// 3 - Adicionar dinheiro na carteira
+                // 4 - Ver meus cartões cadastrados
+                // 5 - Ver minha carteira
 								// 0 - Voltar
 								switch(opcaoSSMenuPagamento){
 									case 1:
@@ -206,6 +209,14 @@ int main (void){
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                     }
 										break;
+                    
+                    case 4:
+                    printf("\n\n\n*** VER MEUS CARTOES CADASTRADOS ***\n\n\n");
+                    break;
+                    
+                    case 5:
+                    printf("\n\n\n*** VER MINHA CARTEIRA ***\n\n\n");
+                    break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
 							break;
@@ -293,7 +304,8 @@ int main (void){
                     if(posX > 0)
                     { 
                           totalIngressos = listarArquivoCarrinho(arqCarrinho);
-                          if(totalIngressos > 0.0 )
+                          totCart = totalNaCarteira(arqCartaoUsuario);
+                          if(totalIngressos <= totCart )
                           { 
                             ingressos = lerIngressos(posX,arqCarrinho);
                             printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
@@ -314,7 +326,7 @@ int main (void){
                               printf("Transacao abortada pelo usuario...\n");
                             }
                           }else{
-                            printf("Não foi encontrado nenhum dado...\n");
+                            printf("Valor na carteira menor do que o valor dos ingressos...\n");
                           }
                     
                     } else {
@@ -627,6 +639,18 @@ void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char n
       }
     }
 
+}
+
+int totalNaCarteira(FILE *arq)
+{
+  float car=0;
+  struct tUsuario usr;
+  fseek(arq,0,SEEK_SET);
+  while(fread(&usr,sizeof(usr),1,arq)!=0)
+  {
+    car+=usr.valorCarteira;
+  }
+  return car;
 }
 
 

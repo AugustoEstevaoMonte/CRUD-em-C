@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<usuarios>
-    <nomeUsuario>rafaela
-</nomeUsuario>
-      <nickname>rafinha
-</nickname>
-      <password>123456
-</password>
+<cartaoUsuario>
     <nomeUsuario>augusto
 </nomeUsuario>
       <nickname>augusto
 </nickname>
       <password>12345
 </password>
-</usuarios>
+      <valorCarteira>500.00</valorCarteira>
+      <numCartao>12345678
+</numCartao>
+      <cvCard>"213"</cvCard>
+</cartaoUsuario>

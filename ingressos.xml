@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ingressosUsuario>
+    <nomeBanda>mamonas assassinas
+</nomeBanda>
+      <localShow>belo horizonte 
+</localShow>
+      <horaInicial>19</horaInicial>
+      <minutoInicial>30</minutoInicial>
+      <horaFinal>22</horaFinal>
+      <minutoFinal>"30"</minutoFinal>
+      <valorIngresso>350.00</valorIngresso>
+    <nomeBanda>Maria Betania
+</nomeBanda>
+      <localShow>brasilia
+</localShow>
+      <horaInicial>22</horaInicial>
+      <minutoInicial>22</minutoInicial>
+      <horaFinal>22</horaFinal>
+      <minutoFinal>"22"</minutoFinal>
+      <valorIngresso>200.00</valorIngresso>
+    <nomeBanda>aaaaaa
+</nomeBanda>
+      <localShow>aaaaaaa
+</localShow>
+      <horaInicial>11</horaInicial>
+      <minutoInicial>11</minutoInicial>
+      <horaFinal>11</horaFinal>
+      <minutoFinal>"11"</minutoFinal>
+      <valorIngresso>200.00</valorIngresso>
+    <nomeBanda>bbbbbb
+</nomeBanda>
+      <localShow>bbbbbb
+</localShow>
+      <horaInicial>22</horaInicial>
+      <minutoInicial>22</minutoInicial>
+      <horaFinal>22</horaFinal>
+      <minutoFinal>"22"</minutoFinal>
+      <valorIngresso>200.00</valorIngresso>
+    <nomeBanda>cccc
+</nomeBanda>
+      <localShow>cccccc
+</localShow>
+      <horaInicial>12</horaInicial>
+      <minutoInicial>12</minutoInicial>
+      <horaFinal>12</horaFinal>
+      <minutoFinal>"12"</minutoFinal>
+      <valorIngresso>200.00</valorIngresso>
+</ingressosUsuario>
