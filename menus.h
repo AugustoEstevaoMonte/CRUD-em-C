@@ -59,17 +59,15 @@ int menuPagamento(){
 		printf("\n\n\n*** FORMAS DE PAGAMENTO ***\n\n\n");
 		printf(" 1 - Adicionar cartao\n");
 		printf(" 2 - Retirar cartao\n");
-		printf(" 3 - Adicionar dinheiro na carteira\n");
-    printf(" 4 - Ver meus cartoes cadastrados\n");
-    printf(" 5 - Ver minha carteira\n");
+		printf(" 3 - Adicionar dinheiro na carteira\n");;
 		printf(" 0 - Voltar\n");
 		printf("\nDigite sua opcao: ");
 		scanf("%d", &op);
-		if(op<0 || op>5){
+		if(op<0 || op>3){
 			printf(ERRO);
 			allPause();
 		}
-	}while(op<0 || op>5);
+	}while(op<0 || op>3);
 	return op;
 }
 

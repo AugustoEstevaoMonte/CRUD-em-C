@@ -143,6 +143,8 @@ int main (void){
                       erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
                       if(erroFunc==1){
                         printf("Numero de cartao invalido, tente novamente...\n");
+                        setbuf(stdin,NULL);
+                        allPause();
                       }
                       
                     }while(erroFunc==1);
@@ -165,7 +167,8 @@ int main (void){
                     } else {
                       printf("Numero de cartao invalido, tente novamente...\n");
                     }
-                      
+                      setbuf(stdin,NULL);
+                      allPause();
 										break;	
 									case 3:
 										printf("\n\n\n*** ADICIONAR DINHEIRO NA CARTEIRA ***\n\n\n");
@@ -204,15 +207,9 @@ int main (void){
                     } else{
                       printf("NAO FOI ENCONTRADO NENHUM CARTAO...\n");
                     }
+                    setbuf(stdin,NULL);
+                    allPause();
 										break;
-                    
-                    case 4:
-                    printf("\n\n\n*** VER MEUS CARTOES CADASTRADOS ***\n\n\n");
-                    break;
-                    
-                    case 5:
-                    printf("\n\n\n*** VER MINHA CARTEIRA ***\n\n\n");
-                    break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
 							break;
@@ -230,6 +227,8 @@ int main (void){
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
                     setbuf(stdin,NULL);
                     listArqCar(arqCarrinho);
+                    setbuf(stdin,NULL);
+                    allPause();
 										break;
 									case 2:
 										printf("\n\n\n*** ADICIONAR ITEM ***\n\n\n");
@@ -249,8 +248,8 @@ int main (void){
                     }else{
                       printf("Codigo nao encontrado, tente novamente....\n");
                     }
-                    
-
+                    setbuf(stdin,NULL);
+                    allPause();
 										break;	
 									case 3:
 										printf("\n\n\n*** EXCLUIR ITEM ***\n\n\n");
@@ -277,6 +276,8 @@ int main (void){
                     }else{
                       printf(ERRO);
                     }
+                    setbuf(stdin,NULL);
+                    allPause();
 										break;
 									case 4:
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
@@ -323,12 +324,13 @@ int main (void){
                               printf("Transacao abortada pelo usuario...\n");
                             }
                           }else{
-                            printf("Valor na carteira menor do que o valor dos ingressos...\n");
+                            printf("Valor na carteira menor do que o valor dos ingressos ou NENHUM ITEM FOI ADICIONADO AO CARRINHO\n");
                           }
                     
                     } else {
                       printf(ERRO);
                     }
+                    allPause();
 										break;
 								}
 							}while(opcaoSSMenuCarrinho!=0);
@@ -346,7 +348,8 @@ int main (void){
                       printf("Codigo invalido, tente novamente...\n");
                       //allPause();
                     }
-
+               setbuf(stdin,NULL);
+               allPause();
               break;
 					}
 			}while(opcaoSMenuUser!=0);
@@ -371,8 +374,8 @@ int main (void){
           usr.valorCarteira = 0;
           gravaDadosNoArquivoUsuario(arqCadastro,usr,-1); 
 					printf("Usuario cadastrado com sucesso...\n");
-        
-				getchar();//allPause();
+        setbuf(stdin,NULL);
+				allPause();
 				break;
 			case 3:
       do{
@@ -400,7 +403,8 @@ int main (void){
             exportarAdminXML(arqAdministrador,"admina.xml");
           }
       }while (flag==0);
-				printf("LOGIN REALIZADO COM SUCESSO!!!!\n"); // //Modificado hoje no dia 07/05/2021
+				printf("LOGIN REALIZADO COM SUCESSO!!!!\n"); 
+        setbuf(stdin,NULL);
 				allPause();
 				//INICIO DO SUB-MENU PARA ADMINISTRADOR
 				do{
@@ -416,6 +420,8 @@ int main (void){
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
 
               listagemIngressos(arqIngressos);
+              setbuf(stdin,NULL);
+              allPause();
 							
 							break;
 						case 2:
@@ -430,8 +436,7 @@ int main (void){
             ingressos.minFim= leValidaMinFim();
             ingressos.valor=leValidaValor();
 
-           
-            //fwrite(&ingressos, sizeof(ingressos), 1, arqIngressos);//Tenta SEEK_SET
+        
             
 
              printf("\n\n\n%d - %sLocal: %sInicio: %d:%d - Final: %d:%d\nValor: %.2f\n\n",ingressos.codigo, ingressos.banda, ingressos.local, ingressos.horaIni, ingressos.minIni, ingressos.horaFim, ingressos.minFim, ingressos.valor);
@@ -526,7 +531,8 @@ int main (void){
                     } else {
                       printf("Ingresso indisponivel\n");
                     }
-                      
+                  setbuf(stdin,NULL);
+                  allPause();
 
 							break;
 						case 5:
@@ -544,11 +550,13 @@ int main (void){
 									case 1:
 										printf("\n\n\n*** USUARIOS ***\n\n\n");
                     listarUsuarios(arqCadastro);
+                    setbuf(stdin,NULL);
 										allPause();
 										break;
 									case 2:
 										printf("\n\n\n*** ADMINISTRACAO ***\n\n\n");
                     listarAdmin(arqAdministrador);
+                    setbuf(stdin,NULL);
 										allPause();
 										break;
 									case 3:
@@ -557,6 +565,7 @@ int main (void){
 					          leValidaUsrPassword(admin.adminPassword);
 					          gravaDadosArquivoAdministrador(arqAdministrador,admin);
                     printf("CONTA CRIADA COM SUCESSO!!!\n");
+                    setbuf(stdin,NULL);
 										allPause();
 										break;
 									case 4:
@@ -594,6 +603,8 @@ int main (void){
                     }else{
                       printf(ERRO);
                     }
+                    setbuf(stdin,NULL);
+                    allPause();
 										break;
 									
 								}
