@@ -16,10 +16,6 @@
 #include "exportaxml.h"
 
 void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[]);
-int exportarCadastroXML(FILE *arq, char nome[]);
-int exportarCardXML(FILE *arq, char nome[]);
-int exportarIngressosXML(FILE *arq, char nome[]);
-int exportarAdminXML(FILE *arq, char nome[]);
 int totalNaCarteira(FILE *arq);
 
 
@@ -391,6 +387,7 @@ int main (void){
             gravaDadosArquivoAdministrador(arqAdministrador,admin);
             printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
           }
+          setbuf(stdin,NULL);
           leValidaUsrName(admin.adminName);  // ADMINISTRADOR ENCOTRADO, INICIANDO LOGIN E SENHA Modificado hoje no dia 07/05/2021 
           leValidaUsrPassword(admin.adminPassword);  //Modificado hoje no dia 07/05/2021 
           if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)  //Modificado hoje no dia 07/05/2021 
@@ -569,6 +566,7 @@ int main (void){
                     do
                     {
                       printf("Digite aqui o nome do Adm para ser excluido: \n");
+                      setbuf(stdin,NULL);
                       fgets(admin.adminName,MAX,stdin);
                       if(strlen(admin.adminName)==1 || strlen(admin.adminName)<=5)
                       {

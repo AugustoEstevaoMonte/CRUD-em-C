@@ -39,7 +39,6 @@ void listarAdmin(FILE *arq)
   while(fread(&adm,sizeof(adm),1,arq)!=0)
   {
     printf("Nome do administrador: %s\nSenha do administrador: %s\n",adm.adminName,adm.adminPassword);
-    getchar();
   }
 }
 
