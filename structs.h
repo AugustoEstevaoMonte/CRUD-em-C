@@ -1,7 +1,7 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-struct tIngressos ////Modificado hoje no dia 08/05/2021
+struct tIngressos 
 { 
 	int codigo;
   int horaIni;

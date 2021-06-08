@@ -9,11 +9,12 @@ FILE *abreArquivo(char nomeArquivo[]);
 void allPause()
 {
   char allP;
-  printf("Pressione qualquer tecla para continuar...\n");
+  printf("\n\nPressione qualquer tecla para continuar...\n");
   setbuf(stdin,NULL);
   allP = getchar();
   system("cls||clear");
 } 
+
 
 FILE *abreArquivo(char nomeArquivo[])
 {

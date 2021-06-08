@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "funcoesuteis.h" //Contém AllPause, abreArquivo e exportarXML
+#include "funcoesuteis.h" //Contém AllPause, abreArquivo
 #include "menus.h" //Biblioteca criada no dia 11/05 para os "Menus"
 #include "validacoes.h" //Biblioteca criada no dia 11/05 para validações
 #include "structs.h" //Biblioteca contendo structs | OBS: ELA SEMPRE DEVE ESTAR EM PRIMEIRO NA INCLUSAO |
@@ -12,11 +12,8 @@
 #include "leitura.h" //Biblioteca contendo funções de leitura
 #include "verificacoes.h" //Biblioteca contendo funções de verificação
 #include "consultas.h" //Biblioteca contendo funções de consulta
-#include "exclusaocancelamento.h"
-#include "exportaxml.h"
-
-void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[]);
-int totalNaCarteira(FILE *arq);
+#include "exclusaocancelamento.h" //Biblioteca contendo funções de cancelamento e exclusão
+#include "exportaxml.h" //Biblioteca contendo o código para exportar arquivos XML
 
 
 //MAIN***********************************************************************************************
@@ -28,7 +25,7 @@ int main (void){
   struct tIngressos ingressos;
   char nomeUser,userKey, userKey2;
 	int opcaoMenuLogin, opcaoSMenuUser, opcaoSSMenuPagamento, opcaoSSMenuCarrinho, opcaoSMenuAdm, opcaoSSMenuGerenciamento,erroFunc=0,posX, posY, flag;
-  int buscaIngresso,totCart=0;
+  int buscaIngresso,totCart=0,regex=0;
   float saldoCarteira=0,totalIngressos=0;
 
 
@@ -37,8 +34,6 @@ int main (void){
   arqCartaoUsuario = abreArquivo("infoCartao.csv");
   arqCarrinho = abreArquivo("carrinhoUser.csv");
 
-
-  // ARRANJAR UM JEITO DE FAZER ISSO TUDO VIRAR UM ARQUIVO .XML
 	do{
 	opcaoMenuLogin = menuLogin();
 		//primeiro menu, onde tem:
@@ -50,6 +45,7 @@ int main (void){
 		switch(opcaoMenuLogin){
 			case 1:
       do{
+        system("cls||clear");
         printf("\n\n\n*** ENTRAR ***\n\n\n");
         setbuf(stdin,NULL);
         leValidaUsrNickname(usr.usrNickName);
@@ -77,9 +73,12 @@ int main (void){
 					// 0 - Logout
 					switch(opcaoSMenuUser){
 						case 1:
+             system("cls||clear");
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
-              setbuf(stdin,NULL);
               listagemIngressos(arqIngressos);
+                setbuf(stdin,NULL);
+                allPause();
+
 							break;
 						case 2:
 							//INICIO DO SUB-SUB-MENU PARA PAGAMENTO
@@ -88,12 +87,12 @@ int main (void){
 								// 1 - Adicionar cartao
 								// 2 - Retirar cartao
 								// 3 - Adicionar dinheiro na carteira
-                // 4 - Ver meus cartões cadastrados
-                // 5 - Ver minha carteira
+                // 4 - Saldo na carteira
 								// 0 - Voltar
 								switch(opcaoSSMenuPagamento){
 									case 1:
                     do{    
+                      system("cls||clear");
                           printf("\n\n\n*** ADICIONAR CARTAO ***\n\n\n");
                           printf("Digite aqui o numero do cartao: \n");
                           setbuf(stdin,NULL);
@@ -135,6 +134,7 @@ int main (void){
                       
 										break;
 									case 2:
+                  system("cls||clear");
 										printf("\n\n\n*** RETIRAR CARTAO ***\n\n\n");
                     do{
                       printf("Digite aqui o numero do cartao que deseja remover: \n");
@@ -171,6 +171,7 @@ int main (void){
                       allPause();
 										break;	
 									case 3:
+                  system("cls||clear");
 										printf("\n\n\n*** ADICIONAR DINHEIRO NA CARTEIRA ***\n\n\n");
                      do
                     {
@@ -195,8 +196,19 @@ int main (void){
                       userKey = toupper(userKey);
                       if(userKey=='S')
                       {    
+                          do
+                          { 
                           printf("Digite um valor que deseja adicionar: \n");
                           scanf("%f",&saldoCarteira);
+
+                          if(saldoCarteira<=0.0)
+                          {
+                             printf("Saldo invalido, tente novamente...\n\n");
+                          }
+
+                          }while(saldoCarteira<=0.0);
+
+                          setbuf(stdin,NULL);
                           usr.valorCarteira+=saldoCarteira;
                           printf("VALOR ADICIONADO COM SUCESSO!!\n");
                           gravaDadosArqCartao(arqCartaoUsuario,usr,posX);
@@ -210,6 +222,36 @@ int main (void){
                     setbuf(stdin,NULL);
                     allPause();
 										break;
+                    case 4:
+                    system("cls||clear");
+                  	printf("\n\n\n*** SALDO ***\n\n\n");
+                     
+                    do
+                    {
+                      printf("Confirme o numero do cartao: \n");
+                      setbuf(stdin,NULL);
+                      fgets(usr.card.usrNumCartao,MAX,stdin);
+                      erroFunc = leValidaNumeroCartao(usr.card.usrNumCartao);
+                      if(erroFunc==1)
+                      {
+                        printf("Numero de cartao invalido, tente novamente...\n");
+                      }
+                      
+                    }while(erroFunc==1);
+                    posX = consultaNumeroCartao(arqCartaoUsuario,usr.card.usrNumCartao);
+                    if(posX > 0)
+                   { 
+                      usr = lerCarteiraUsr(posX,arqCartaoUsuario); 
+                      printf("Voce tem na carteira: %0.2f\n",usr.valorCarteira);
+                      setbuf(stdin,NULL);
+                      allPause();
+                   }else{
+                     printf("Cartao nao encontrado...\n");
+                     setbuf(stdin,NULL);
+                     allPause();
+                   }
+
+                    break;
 								}
 							}while(opcaoSSMenuPagamento!=0);
 							break;
@@ -224,6 +266,7 @@ int main (void){
 								// 0 - Voltar
 								switch(opcaoSSMenuCarrinho){
 									case 1:
+                  system("cls||clear");
 										printf("\n\n\n*** VER MEU CARRINHO ***\n\n\n");
                     setbuf(stdin,NULL);
                     listArqCar(arqCarrinho);
@@ -231,6 +274,7 @@ int main (void){
                     allPause();
 										break;
 									case 2:
+                  system("cls||clear");
 										printf("\n\n\n*** ADICIONAR ITEM ***\n\n\n");
                     listagemIngressos(arqIngressos);
                     setbuf(stdin,NULL);
@@ -252,6 +296,7 @@ int main (void){
                     allPause();
 										break;	
 									case 3:
+                  system("cls||clear");
 										printf("\n\n\n*** EXCLUIR ITEM ***\n\n\n");
                     listArqCar(arqCarrinho);
                     printf("Digite aqui o codigo do ingresso que deseja EXCLUIR...\n");
@@ -280,6 +325,7 @@ int main (void){
                     allPause();
 										break;
 									case 4:
+                  system("cls||clear");
 										printf("\n\n\n*** FINALIZAR COMPRA ***\n\n\n");
                     printf("Confirme o numero do seu cartao...\n");
 
@@ -306,7 +352,7 @@ int main (void){
                           { 
                             ingressos = lerIngressos(posX,arqCarrinho);
                             printf("Valor total da(s) compra(s): %0.2f\n",totalIngressos);
-                            usr = lerCarteiraUsr(posX,arqCartaoUsuario); //Alterei aqui
+                            usr = lerCarteiraUsr(posX,arqCartaoUsuario);
                             printf("Voce tem na carteira: %0.2f\n",usr.valorCarteira);//Exibe o valor da carteira
                             printf("Deseja continuar com a transacao? (S ou N)\n");
                             setbuf(stdin,NULL);
@@ -315,11 +361,11 @@ int main (void){
                             if(userKey=='S')
                             {
                                 subtraiValores(&usr,totalIngressos,arqCartaoUsuario,usr.card.usrNumCartao);
-                                gravaCardAlt(arqCartaoUsuario,usr,posX);//ESTOU AQUI
-                                printf("TRANSACAO FINALIZADA COM SUCESSO!!!!\n");
+                                gravaCardAlt(arqCartaoUsuario,usr,posX);
                                 setbuf(stdin,NULL);
                                 cancelaIngressoArqCarrinho(arqCarrinho,posX);
                                 excluirFisicamenteCarrrinho(&arqCarrinho,"carrinhoUser.csv");
+                                printf("TRANSACAO REALIZADA COM SUCESSO!!!!\n");
                             } else{
                               printf("Transacao abortada pelo usuario...\n");
                             }
@@ -336,6 +382,7 @@ int main (void){
 							}while(opcaoSSMenuCarrinho!=0);
 							break;
               case 4:
+              system("cls||clear");
               printf("\n\n*** CONSULTA ***\n\n");
               printf("Digite aqui o codigo do ingresso: ");
               setbuf(stdin,NULL);
@@ -343,10 +390,13 @@ int main (void){
               posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
               if(posX > 0){
                        leituraIngresso(arqIngressos, buscaIngresso);
+                       setbuf(stdin,NULL);
+									  	 allPause();
                         
                     } else {
                       printf("Codigo invalido, tente novamente...\n");
-                      //allPause();
+                      setbuf(stdin,NULL);
+									  	allPause();
                     }
                setbuf(stdin,NULL);
                allPause();
@@ -355,7 +405,9 @@ int main (void){
 			}while(opcaoSMenuUser!=0);
 				break;
 			case 2:
+      
           do{
+            system("cls||clear");
               printf("\n\n\n*** CADASTRAR ***\n\n\n");
               setbuf(stdin,NULL);
               leValidaUsrName(usr.usrName);
@@ -379,6 +431,7 @@ int main (void){
 				break;
 			case 3:
       do{
+        system("cls||clear");
           printf("\n\n\n*** ENTRAR COMO ADMINISTRADOR ***\n\n\n");
           arqAdministrador = fopen("admin.csv","r+b");
           if(arqAdministrador == NULL) //ARQ = NULL QUER DIZER QUE NÃO FOI ENCONTRADO NENHUM ADMIN/ARQUIVO,  Modificado hoje no dia 07/05/2021 
@@ -391,9 +444,9 @@ int main (void){
             printf("CADASTRO REALIZADO COM SUCESSO!!!\n");
           }
           setbuf(stdin,NULL);
-          leValidaUsrName(admin.adminName);  // ADMINISTRADOR ENCOTRADO, INICIANDO LOGIN E SENHA Modificado hoje no dia 07/05/2021 
-          leValidaUsrPassword(admin.adminPassword);  //Modificado hoje no dia 07/05/2021 
-          if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)  //Modificado hoje no dia 07/05/2021 
+          leValidaUsrName(admin.adminName);  // ADMINISTRADOR ENCOTRADO, INICIANDO LOGIN E SENHA 
+          leValidaUsrPassword(admin.adminPassword); 
+          if(verificaUsuarioAdminEsenha(arqAdministrador,admin.adminName,admin.adminPassword)==1)   
           {
             printf(ERRO);
             allPause();
@@ -417,17 +470,28 @@ int main (void){
 					// 0 - Logout
 					switch(opcaoSMenuAdm){
 						case 1:
+            system("cls||clear");
 							printf("\n\n\n*** INGRESSOS DISPONIVEIS ***\n\n\n");
 
               listagemIngressos(arqIngressos);
-              setbuf(stdin,NULL);
               allPause();
 							
 							break;
 						case 2:
+            system("cls||clear");
 							printf("\n\n\n*** ADICIONAR INGRESSOS ***\n\n\n");
+            do
+            {
+              ingressos.codigo=leValidaCodigo();
+              regex = codRepetido(arqIngressos,ingressos.codigo);
+              if(regex<0)
+              {
+                 printf("Codigo de ingresso repetido, tente novamente...\n");
+              }
 
-            ingressos.codigo=leValidaCodigo();
+            }while(regex<0);
+            setbuf(stdin,NULL);
+
             leValidaNomeBanda(ingressos.banda);
             leValidaLocal(ingressos.local);
             ingressos.horaIni=leValidaHorasIni();
@@ -450,6 +514,7 @@ int main (void){
 
 							break;
 						case 3:
+            system("cls||clear");
 							printf("\n\n\n*** ALTERAR INGRESSOS ***\n\n\n");
 
               do
@@ -504,6 +569,7 @@ int main (void){
 							
 							break;
 						case 4:
+            system("cls||clear");
 							printf("\n\n\n*** EXCLUIR INGRESSOS ***\n\n\n");
 
                    
@@ -548,18 +614,21 @@ int main (void){
 								// 0 - Voltar 
 								switch(opcaoSSMenuGerenciamento){
 									case 1:
+                  system("cls||clear");
 										printf("\n\n\n*** USUARIOS ***\n\n\n");
                     listarUsuarios(arqCadastro);
                     setbuf(stdin,NULL);
 										allPause();
 										break;
 									case 2:
+                  system("cls||clear");
 										printf("\n\n\n*** ADMINISTRACAO ***\n\n\n");
                     listarAdmin(arqAdministrador);
                     setbuf(stdin,NULL);
 										allPause();
 										break;
 									case 3:
+                  system("cls||clear");
 										printf("\n\n\n*** ADICIONAR CONTA DE ADMINISTRADOR ***\n\n\n");
                     leValidaUsrName(admin.adminName);
 					          leValidaUsrPassword(admin.adminPassword);
@@ -569,7 +638,7 @@ int main (void){
 										allPause();
 										break;
 									case 4:
-                  
+                  system("cls||clear");
 										printf("\n\n\n*** EXCLUIR CONTA DE ADMINISTRADOR ***\n\n\n");
                     printf("Digite aqui o nome do administrador(a)...\n");
                     do
@@ -611,16 +680,20 @@ int main (void){
 							}while(opcaoSSMenuGerenciamento!=0);
 							break;
               case 6:
+              system("cls||clear");
               printf("\n\n*** CONSULTA ***\n\n");
               printf("Digite aqui o codigo do ingresso: ");
               scanf("%d", &buscaIngresso);
               posX = consultaCodShow(&ingressos,arqIngressos,buscaIngresso);
               if(posX > 0){
                        leituraIngresso(arqIngressos, buscaIngresso);
+                       setbuf(stdin,NULL);
+									  	allPause();
                         
                     } else {
                       printf("Codigo invalido, tente novamente...\n");
-                      //allPause();
+                      setbuf(stdin,NULL);
+									  	allPause();
                     }
               break;
 					}
@@ -630,37 +703,13 @@ int main (void){
 		}
 	}while(opcaoMenuLogin!=0);
 
-	fclose(arqCadastro); //Modificado hoje no dia 07/05/2021 - CONSERTADO O PROBLEMA DE REESCREVER USUARIOS
+	fclose(arqCadastro);
 	fclose(arqAdministrador);
   fclose(arqCartaoUsuario);
   fclose(arqCarrinho);
 	return 0;
 }
 
-void subtraiValores(struct tUsuario *usr, float valor, FILE *arqCarteira, char numCard[])
-{
-  fseek(arqCarteira, 0, SEEK_SET);
-	  while(fread(&(*usr),sizeof(*usr),1,arqCarteira)!=0)
-    {
-      if(strcmp((*usr).card.usrNumCartao,numCard)==0)
-      {
-            (*usr).valorCarteira-=valor;
-            printf("O novo valor e de: %0.2f R$\n",(*usr).valorCarteira);
-      }
-    }
 
-}
-
-int totalNaCarteira(FILE *arq)
-{
-  float car=0;
-  struct tUsuario usr;
-  fseek(arq,0,SEEK_SET);
-  while(fread(&usr,sizeof(usr),1,arq)!=0)
-  {
-    car+=usr.valorCarteira;
-  }
-  return car;
-}
 
 

@@ -16,7 +16,7 @@ int menuLogin()
 {
 	int op;
 	do{
-		system("cls");
+    system("cls||clear");
 		printf("\n\n\n*** LOGIN ***\n\n\n");
 		printf(" 1 - Entrar\n");
 		printf(" 2 - Cadastrar\n");
@@ -35,7 +35,7 @@ int menuLogin()
 int menuUser(){
 	int op;
 	do{
-		system("cls");
+		system("cls||clear");
 		printf("\n\n\n*** ENTRADA ***\n\n\n");
 		printf(" 1 - Ingressos disponiveis\n");
 		printf(" 2 - Formas de pagamento\n");
@@ -55,26 +55,27 @@ int menuUser(){
 int menuPagamento(){
 	int op;
 	do{
-		system("cls");
+		system("cls||clear");
 		printf("\n\n\n*** FORMAS DE PAGAMENTO ***\n\n\n");
 		printf(" 1 - Adicionar cartao\n");
 		printf(" 2 - Retirar cartao\n");
-		printf(" 3 - Adicionar dinheiro na carteira\n");;
+		printf(" 3 - Adicionar dinheiro na carteira\n");
+    printf(" 4 - Saldo na carteira\n");
 		printf(" 0 - Voltar\n");
 		printf("\nDigite sua opcao: ");
 		scanf("%d", &op);
-		if(op<0 || op>3){
+		if(op<0 || op>4){
 			printf(ERRO);
 			allPause();
 		}
-	}while(op<0 || op>3);
+	}while(op<0 || op>4);
 	return op;
 }
 
 int menuCarrinho(){
 	int op;
 	do{
-		system("cls");
+		system("cls||clear");
 		printf("\n\n\n*** MEU CARRINHO ***\n\n\n");
 		printf(" 1 - Ver meu carrinho\n");
 		printf(" 2 - Adicionar item\n");
@@ -94,6 +95,7 @@ int menuCarrinho(){
 int menuAdm(){
 	int op;
 	do{
+    system("cls||clear");
 		printf("\n\n\n*** MENU DO ADMINISTRADOR ***\n\n\n");
 		printf(" 1 - Ingressos disponiveis\n");
 		printf(" 2 - Adicionar ingresso\n");
@@ -115,7 +117,7 @@ int menuAdm(){
 int menuGerenciamento(){
 	int op;
 	do{
-		system("cls");
+		system("cls||clear");
 		printf("\n\n\n*** GERENCIAMENTO DE CONTAS ***\n\n\n");
 		printf(" 1 - Usuarios\n");
 		printf(" 2 - Administracao\n");

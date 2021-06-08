@@ -42,7 +42,7 @@ void excluirFisicamenteCartao (FILE **arqCard, char nome[]){
 	fclose(*arqCard);
 	fclose(arqAux);
 	remove(nome);
-	rename("infoCartao.aux", nome); //
+	rename("infoCartao.aux", nome); 
   *arqCard = abreArquivo(nome);
 }
 
@@ -111,7 +111,7 @@ void excluirFisicamenteAdmin (FILE **arqAdm, char nome[])
 	fclose(*arqAdm);
 	fclose(arqAux);
 	remove(nome);
-	rename("admin.aux", nome); //
+	rename("admin.aux", nome); 
   *arqAdm = abreArquivo(nome);
 }
 
@@ -126,7 +126,7 @@ void cancelaIngressoArqCarrinho(FILE *arq, int reg)
 
 }
 
-void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int pra void
+void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){
 	FILE *arqAux = fopen("carrinhoUser.aux", "w");
 	struct tIngressos ing;
 	
@@ -146,7 +146,7 @@ void excluirFisicamenteCarrrinho (FILE **arqCarrinho, char nome[]){//mudar int p
 	fclose(*arqCarrinho);
 	fclose(arqAux);
 	remove(nome);
-	rename("carrinhoUser.aux", nome); //
+	rename("carrinhoUser.aux", nome); 
   *arqCarrinho = abreArquivo(nome);
 }
 

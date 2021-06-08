@@ -45,7 +45,7 @@ void leituraIngresso(FILE *arq, int busca)
       return;
     }
 	}
-  //leitura de arquivo - abre o arquivo, passa pelas informações que estão nele, imprime o que voce quer imprimir de acordo com os comandos
+ 
 	
 }
 

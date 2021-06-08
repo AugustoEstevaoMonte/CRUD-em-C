@@ -88,7 +88,7 @@ void leValidaNomeBanda(char banda[])
    do
     {
         printf("\nBanda: ");
-        fflush(stdin);
+        setbuf(stdin, NULL);
         fgets(banda, MAX, stdin);
         if(strlen(banda)<=3)
         {
@@ -112,7 +112,7 @@ void leValidaLocal(char local[])
 
 }
 
-int leValidaHorasIni()  //Tinha que ter colocado um char aqui, não precisava ter criado outra função só pra isso.
+int leValidaHorasIni() 
 {
     int horas;
      do
