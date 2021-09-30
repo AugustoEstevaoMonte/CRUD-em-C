@@ -12,8 +12,9 @@
 <p align="center">
   <a href="#-sobre">Sobre o projeto</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#-diagrama">Diagrama de Classe</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-links">Links</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-contato">Contato</a>
+  <a href="#-tecnology">Linguagem de Programação</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-projectBuild">Construção do projeto</a>
+  <a href="#-authors">Autores do projeto</a>
 </p>
 
 ## :page_with_curl: Sobre o projeto <a name="-sobre"/></a>
@@ -27,16 +28,16 @@
    
 </h1>
 
-## Tecnologia:
+## :page_with_curl: Tecnologia: <a name="-tecnology"/></a>
 - [x] C <br>
 
-## Construção do Projeto:
+## :page_with_curl: Construção do Projeto: <a name="-projectBuild"/></a>
 - [x] Headers (garantir modularização do projeto)<br>
 - [x] CRUD <br>
 - [x] Exporta arquivos persistentes para XML <br>
 
 
-<h1>Autores</h1>
+## :page_with_curl: Autores <a name="-authors"/></a>
 - Augusto Estevão Monte<br>
 - Rafaela Mendonça Amâncio
 
